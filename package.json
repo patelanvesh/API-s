@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "API automation with newman",
   "scripts": {
-    "api-tests": "echo \"Error: no test specified\" && exit 1"
+    "api-tests": "newman run Authenticated_Mobile_API-US.postman_collection.json -e qs05_Environment.postman_environment.json"
   },
   "repository": {
     "type": "git",
