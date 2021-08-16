@@ -1,0 +1,2818 @@
+{
+	"info": {
+		"_postman_id": "30978546-4c98-465d-bc9b-d14d134cb8dd",
+		"name": "Authenticated_Mobile_API-US",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "AuthConfigDetails",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"var data = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"client_id\", data.environmentDetails.salesforce.clientID);\r",
+							"pm.environment.set(\"mobile_search_url\", data.environmentDetails.mobileSearch.baseURL);\r",
+							"pm.environment.set(\"mobile_search_api_key\", data.environmentDetails.mobileSearch.apiKey);\r",
+							"\r",
+							"pm.environment.set(\"environment_api_key\", data.environmentDetails.tcast.apiKey);\r",
+							"\r",
+							"pm.environment.set(\"callbackURI\", data.environmentDetails.salesforce.callbackURI);\r",
+							"\r",
+							"pm.environment.set(\"identifier\", data.environmentDetails.identifier);\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var chars = 'abcdefghijklmnopqrstuvwxyz1234567890';\r",
+							"var string = '';\r",
+							"var firstName = '';\r",
+							"var lastName = '';\r",
+							"\r",
+							"//genernate random email\r",
+							"for(var ii=0; ii<5; ii++){\r",
+							"    string += chars[Math.floor(Math.random() * chars.length)];\r",
+							"}\r",
+							"\r",
+							"//Last Name: QA+Test + Testers Initials + NN (Sequential number)\r",
+							"var sequenceNumber = Number(pm.environment.get('LastNameCounter'));\r",
+							"\r",
+							"var randmonEmail = 'QATEST' + string + sequenceNumber +  '@Automation.com';\r",
+							"pm.environment.set('email',randmonEmail);\r",
+							"pm.environment.set('locale_us', 'en_US');\r",
+							"pm.environment.set('locale_ca', 'en_CA');\r",
+							"pm.environment.set('CountryInitials', 'US');\r",
+							"pm.environment.set('CACountryInitials', 'CA');\r",
+							"\r",
+							"\r",
+							"console.log(encodeURIComponent(randmonEmail));\r",
+							"pm.environment.set('encode_email',encodeURIComponent(randmonEmail));\r",
+							"\r",
+							"//password\r",
+							"pm.environment.set('encode_password', encodeURIComponent('Tester1!@#$%^&*()'));\r",
+							"\r",
+							"//First Name:QA + [2 letter country ISO  abbreviation]        \r",
+							"//create first name\r",
+							"pm.environment.set('firstName','QA' + pm.environment.get('CountryInitials'));\r",
+							"\r",
+							"var lastName = 'QATEST' + pm.environment.get('TesterInitials') + sequenceNumber;\r",
+							"pm.environment.set('lastName',lastName);  \r",
+							"pm.environment.set('LastNameCounter',sequenceNumber + 1);  \r",
+							"\r",
+							"//random phone number....find a good phone number\r",
+							"do {\r",
+							"\tphoneNumber = Math.floor(Math.pow(10, 9) + Math.random() * 9 * Math.pow(10,9));\r",
+							"\tvar phoneRegex = /^\\(?([2-9]{3})\\)?[-. ]?([2-9]{3})[-. ]?([0-9]{4})$/;\r",
+							"\tconsole.log(phoneRegex.test(phoneNumber));\r",
+							"  \t// console.log(phoneNumber);\r",
+							"}while (!phoneRegex.test(phoneNumber));\r",
+							"\r",
+							"//format phone to desired \r",
+							"phoneNumber = formatPhoneNumber(phoneNumber);\r",
+							"console.log(phoneNumber);\r",
+							"pm.environment.set('phone',phoneNumber);\r",
+							"\r",
+							"//set source\r",
+							"pm.environment.set('sourceId','RH App');\r",
+							"\r",
+							"//now generate verification code\r",
+							"var rString = generateVerificationCode();\r",
+							"// console.log(rString);\r",
+							"//set source\r",
+							"pm.environment.set('randomVerificationCode',rString);\r",
+							"\r",
+							"pm.environment.set('todayDate',generateDate());\r",
+							"pm.environment.set('futureExpiryDate',generateDate(15));\r",
+							"\r",
+							"//format phone number\r",
+							"function formatPhoneNumber(phoneNumberString) {\r",
+							"  var cleaned = ('' + phoneNumberString).replace(/\\D/g, '')\r",
+							"  var match = cleaned.match(/^(\\d{3})(\\d{3})(\\d{4})$/)\r",
+							"  if (match) {\r",
+							"    return '(' + match[1] + ') ' + match[2] + '-' + match[3]\r",
+							"  }\r",
+							"  return null\r",
+							"}\r",
+							"\r",
+							"//generate verification code\r",
+							"function generateVerificationCode() {\r",
+							"    var length = 40;\r",
+							"    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';\r",
+							"    var result = '';\r",
+							"    for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"//Generate date\r",
+							"function generateDate(strDays){\r",
+							"    const dtDate = new Date();\r",
+							"    if (strDays != undefined){\r",
+							"        dtDate.addDays(strDays);\r",
+							"    }\r",
+							"    return dtDate.toISOString();\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/authconfig?getdetails=true",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"authconfig"
+					],
+					"query": [
+						{
+							"key": "getdetails",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SOAP Login - Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var result = xml2Json(pm.response.text())[\"soapenv:Envelope\"][\"soapenv:Body\"].loginResponse.result;",
+							"var url = result.serverUrl.split(\"/\");",
+							"pm.environment.set(\"admin_accessToken\", result.sessionId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "login",
+						"type": "text"
+					},
+					{
+						"key": "charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<env:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <env:Body>\n    <n1:login xmlns:n1=\"urn:partner.soap.sforce.com\">\n      <n1:username>{{admin_username}}</n1:username>\n      <n1:password>{{admin_password}}{{admin_securityToken}}</n1:password>\n    </n1:login>\n  </env:Body>\n</env:Envelope>"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/Soap/u/v48.0",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"Soap",
+						"u",
+						"v48.0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query Master Data",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var sequenceNumber = Number(pm.environment.get('companyNameCounter'));\r",
+							"if (sequenceNumber == undefined){\r",
+							"    sequenceNumber = 0;\r",
+							"}\r",
+							"\r",
+							"//Account name \r",
+							"//QA + [2 letter country ISO abbreviation] + TEST + Testers Initials + NN(sequential number)\r",
+							"//QAUSTESTCOMPAUTOSP(random number )\r",
+							"pm.environment.set('accountName','QA' + pm.environment.get('CountryInitials') \r",
+							"                    + 'TESTCOMPAUTO' + pm.environment.get('TesterInitials') \r",
+							"                    + sequenceNumber);\r",
+							"\r",
+							"pm.environment.set('companyNameCounter',sequenceNumber + 1);  \r",
+							"\r",
+							"//main address\r",
+							"pm.environment.set('mainCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('mainStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('mainStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							"pm.environment.set('companyPhone',pm.variables.replaceIn(\"{{$randomPhoneNumber}}\"));\r",
+							"\r",
+							"\r",
+							"//Billing address\r",
+							"pm.environment.set('billingCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('billingStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('billingStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"\r",
+							" for(var i=0; i<obj.compositeResponse.length; i++){\r",
+							"    if(obj.compositeResponse[i].referenceId == 'branchName'){\r",
+							"        pm.environment.set('branchId', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'countryName'){\r",
+							"        pm.environment.set('US_Country_of_Record__c', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'stateName'){\r",
+							"        pm.environment.set('US_State__c', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'jobfunction'){\r",
+							"        pm.environment.set('jobfunctionId', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'lobName'){\r",
+							"        pm.environment.set('OT_LOB__c', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"allOrNone\" : true,\n    \"compositeRequest\" : [{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+Branch__c+where+Branch_Name__c=%27{{branch}}%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"branchName\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+job_function__c+where+Name=%27Sr. Finance Accountant%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"jobfunction\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+country__c+where+Name=%27{{country}}%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"countryName\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+state__c+where+Name=%27{{state}}%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"stateName\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+Line_of_Business__c+where+Name=%27{{lob}}%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"lobName\"\n    }]\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/composite",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"composite"
+					]
+				},
+				"description": "Executes actions on multiple records in one request. Use SObject Collections to reduce the number of round-trips between the client and server. This resource is available in API version 42.0 and later.\n\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "CheckEmailCall  -- Generate User",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.test(\"response must be valid and have a body\", function(){\r",
+							"     pm.response.to.be.ok; \r",
+							"     pm.response.to.be.withBody;\r",
+							"     pm.response.to.be.json; \r",
+							"});\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Email in Response \", function(){\r",
+							"    var emailInreq = pm.environment.get('email'); \r",
+							"    pm.expect(data.candidateEmail).to.equal(emailInreq);\r",
+							"});\r",
+							"pm.test(\"Account Status \", function(){\r",
+							"pm.environment.set(\"accountStatus\", \"noSFAccount\");\r",
+							"var accountStatus =pm.environment.get('accountStatus');  \r",
+							"    pm.expect(data.accountCheck).to.equal(accountStatus);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/EmailCheck?candidateEmail={{email}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"EmailCheck"
+					],
+					"query": [
+						{
+							"key": "candidateEmail",
+							"value": "{{email}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Generate Verification Code",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.test(\"Verification code generated successfully \", function(){\r",
+							"    pm.expect(data.message).to.equal('Verification code generated successfully');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/javascript",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"{{email}}\",\n    \"firstName\": \"{{firstName}}\",\n    \"lastName\": \"{{lastName}}\",\n    \"sourceId\": \"{{sourceId}}\",\n    \"phone\": \"{{phone}}\",\n    \"ageVerification\": \"true\",\n    \"authorizedToWorkUS\": \"true\",\n    \"locale\": \"{{locale_us}}\",\n    \"ccode\": \"{{CountryInitials}}\",\n    \"journey\": \"{{journey}}\",\n    \"password\": \"{{password}}\",\n    \"postalCode\": \"{{USPostalCode}}\",\n    \"authorizedToWorkCA\": \"false\",\n    \"lobCode\": \"{{lobCode}}\",\n    \"fileName\": \"{{firstName}}_{{lastName}}_Resume.txt\",\n    \"contentType\": \"text/plain\",\n    \"resume\": \"UUFVUyBRQVRFU1RMWk0NCjI2MTMgQ2FtaW5vIFJhbW9uLCBTYW4gUmFtb24sIENBIDk0NTgzDQogIHx8ICg5MjUpIDY5NS05OTk5IHx8IHFhdXNxYXRlc3RtMDRAZ21haWwuY29tICAgIA0KU09GVFdBUkUgUVVBTElUWSBBU1NVUkFOQ0UgRU5HSU5FRVIgDQpTVU1NQVJZOiANCiAyICsgeWVhcnMgb2YgZXhwZXJpZW5jZSBpbiBRdWFsaXR5IEFzc3VyYW5jZSBvZiB2YXJpb3VzIGZpZWxkcyBpbmNsdWRpbmcgV2ViIGFuZCBNb2JpbGUgc29mdHdhcmUglSBQcm9maWNpZW50IGluIE1hbnVhbCBhbmQgQXV0b21hdGVkIHNvZnR3YXJlIHRlc3RpbmcgaW4gSmF2YSB3aXRoIFNlbGVuaXVtIFdlYkRyaXZlci4glSBFeHBlcmllbmNlZCBpbiBTY3J1bSBBZ2lsZSwgYW5kIFdhdGVyZmFsbCBNZXRob2RvbG9naWVzIHdpdGggYSBzb2xpZCB1bmRlcnN0YW5kaW5nIGFuZCBwcmFjdGljYWwgZXhwZXJpZW5jZSBvZiBzb2Z0d2FyZSBkZXZlbG9wbWVudCBsaWZlIGN5Y2xlIChTRExDKSwgdGVzdGluZyBtZXRob2RvbG9naWVzLiCVIEhhbmRzLW9uIGV4cGVyaWVuY2UgaW4gd3JpdGluZyB0ZXN0IHN1aXRlcyB0ZXN0IHBsYW4gYW5kIHRlc3QgY2FzZXMgZm9yIG5ldyBwcm9kdWN0IGZlYXR1cmVzLCByZXBvcnRpbmcgYW5kIHZlcmlmeWluZyBzb2Z0d2FyZSBkZWZlY3RzLCBRQSB0ZXJtaW5vbG9neSBhbmQgbG9jYWxpemF0aW9uIHByb2Nlc3Nlcy4glSBXb3JrIGV4cGVyaWVuY2Ugd2l0aCBNeVNRTCBkYXRhYmFzZXMuIJUgRXhwZXJpZW5jZSB3aXRoIGRpZmZlcmVudCB0eXBlcyBvZiB0ZXN0aW5nIHN1Y2ggYXMgUmVncmVzc2lvbiwgRnVuY3Rpb25hbCwgV2hpdGUtYm94IFRlc3RpbmcgYW5kIEJsYWNrYm94IFRlc3RpbmcglSBBcm1lZCB3aXRoIHNvbGlkIGNvbW11bmljYXRpb24sIG9yZ2FuaXphdGlvbmFsLCBtdWx0aXRhc2tpbmcsIGFuZCBpbnRlcnBlcnNvbmFsIHNraWxscy4gIJUgSWYgeW91IGFyZSBsb29raW5nIGZvciBzb21lb25lIHdobyBpcyBUZWNobmljYWwgaW4gbmF0dXJlIGJ1dCBmb2N1c2VkIG9uIFF1YWxpdHkgaW4gbWVudGFsaXR5IGFuZCBhcHByb2FjaCwgSSBtYXkgYmUgb2YgdmFsdWUgYW5kIGdvb2QgYWRkaXRpb24gdG8geW91ciB0ZWFtLiANCiANClRFQ0hOSUNBTCBTS0lMTFM6IJUgTGFuZ3VhZ2VzOiAgICAgICAgIEphdmEsIEhUTUwsIFhNTCwgU1FMIJUgVGVzdCBBdXRvbWF0aW9uOiAgICBTZWxlbml1bSwgVGVzdE5HLCBYQ29kZSwgICAgQW5kcm9pZCwgU3R1ZGlvLCBKZW5raW5zLCBBbGx1cmUglSBDSSBhbmQgQnVpbGQgVG9vbHM6IEplbmtpbnMsIE1hdmVuIJUgRGF0YWJhc2U6ICAgICAgICAgTXlTUUwgDQqVIFZlcnNpb24gQ29udHJvbDogICAgR2l0LCBHaXRIdWIglSBWaXJ0dWFsaXphdGlvbjogICAgICAgVmlydHVhbCBCb3gglSBRQSBUcmFja2luZzogICAgICAgIEpJUkEsIEJ1Z3ppbGxhLCBUZXN0UmFpbCCVIE1vYmlsZSBQbGF0Zm9ybXM6ICBpT1MsIEFuZHJvaWQgT1MglSBQbGF0Zm9ybXM6ICAgICAgICAgICAgICBXaW5kb3dzLCBMaW51eCwgTUFDIE9TIFgNCiANClBST0ZFU1NJT05BTCBFWFBFUklFTkNFLiANCiANCpUJQ29tcGFueSBOYW1lOiBSYWdpbmdXaXJlIERhdGEgQ2VudGVyIA0KlQlMb2NhdGlvbjogU2FjcmFtZW50bywgQ0EgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICANCpUJRHVyYXRpb246IDAxLzIwMTggliBQcmVzZW50IA0KlQlKb2IgVGl0bGU6IFNvZnR3YXJlIFFBIEVuZ2luZWVyIA0KDQoNCpUJRGVzY3JpcHRpb246IFdvcmtlZCBjbG9zZWx5IHdpdGggdGhlIHByb2plY3QgbWFuYWdlciBhbmQgdGhlIGRldmVsb3BtZW50IHRlYW0sIGNyZWF0ZWQgVGVzdCBwbGFucyBhbmQgVGVzdCBjYXNlcyBmb3IgbmV3IGZlYXR1cmVzIGFuZCBtYWtpbmcgc3VyZSB0aGF0IHRoZSByZXF1aXJlbWVudHMgYXJlIG1ldCBiZWZvcmUgYW5kIGFmdGVyIGltcGxlbWVudGF0aW9uIG9mIHRoZSBmZWF0dXJlcy4gDQoNCiANCkVEVUNBVElPTiANCg0KRGVncmVlOiBNYXN0ZXIncw0KU2Nob29sIE5hbWU6ICBBQkMgdW5pdmVyc2l0eQ0KR3JhZHVhdGVkIGluIDIwMTgNCk1ham9yOiBDb21wdXRlciBTY2llbmNlDQo=\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/generateVerificationCode?version=v{{appVersion}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"generateVerificationCode"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetVerificationCode",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"console.log(data);",
+							"",
+							"pm.test(\"response must be valid and have a body\", function(){",
+							"     pm.response.to.be.ok; ",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; ",
+							"});",
+							"",
+							"pm.test(\"Validate Status code should be 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.environment.set('verificationCode', data.verificationCode);",
+							"",
+							"pm.test(\"Validate sourceId\", function(){",
+							"    var expected = pm.environment.get('sourceId'); ",
+							"    pm.expect(data.sourceId).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate memberType\", function(){",
+							"    pm.expect(data.memberType).to.equal(\"Candidate\");",
+							"});",
+							"",
+							"pm.test(\"Validate first name\", function(){",
+							"      var expected = pm.environment.get('firstName'); ",
+							"    pm.expect(data.firstName).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate last name\", function(){",
+							"    var expected = pm.environment.get(\"lastName\");",
+							"    pm.expect(data.lastName).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate email\", function(){",
+							"    var expected =pm.environment.get(\"email\")",
+							"    pm.expect(data.email).to.equal(expected);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/registration/getVerificationCode?email={{email}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"registration",
+						"getVerificationCode"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{email}}"
+						},
+						{
+							"key": "version",
+							"value": "v{{appVersion}}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch_Registrant__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"//making sure we got 200 OK\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var registrant_id = obj.records[0].Id;\r",
+							"pm.environment.set('registrantId', registrant_id);\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"    //parse the response json and test three properties\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(obj.records[0].Country_Code__c).to.eql('US');\r",
+							"    pm.expect(obj.records[0].Over_18_Years_of_Age__c).to.be.true;\r",
+							"    pm.expect(obj.records[0].Authorized_to_Work_in_US__c).to.be.true;\r",
+							"    pm.expect(obj.records[0].Verified__c).to.be.false;\r",
+							"\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v48.0/query/?q=Select+Authorized_to_Work_in_US__c,Contact__r.Name,Contact__r.Marketplace_Contact__c,Country_Code__c,CreatedById,CreatedDate,CurrencyIsoCode,Date_Sent__c,Date_Verified__c,Email_Sent__c,Email_verification_URL__c,Email__c,Expiration_Date__c,First_Name__c,Id,IsDeleted,Job_Order__c,Language_Locale__c,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,Last_Name__c,Line_of_Business__c,LinkedIn_Profile__c,Name,Over_18_Years_of_Age__c,OwnerId,Password__c,Phone_Number__c,Phone_Type__c,Photo__c,Postal_Code__c,Record_Type__c,Resume_File_Name__c,Source__c,SystemModstamp,TCAST_Access__c,Type__c,User__c,Verification_Code__c,Verification_Link_Source__c,Verified__c+FROM+Registrants__c+WHERE Email__c+=+'{{email}}'",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v48.0",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "Select+Authorized_to_Work_in_US__c,Contact__r.Name,Contact__r.Marketplace_Contact__c,Country_Code__c,CreatedById,CreatedDate,CurrencyIsoCode,Date_Sent__c,Date_Verified__c,Email_Sent__c,Email_verification_URL__c,Email__c,Expiration_Date__c,First_Name__c,Id,IsDeleted,Job_Order__c,Language_Locale__c,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,Last_Name__c,Line_of_Business__c,LinkedIn_Profile__c,Name,Over_18_Years_of_Age__c,OwnerId,Password__c,Phone_Number__c,Phone_Type__c,Photo__c,Postal_Code__c,Record_Type__c,Resume_File_Name__c,Source__c,SystemModstamp,TCAST_Access__c,Type__c,User__c,Verification_Code__c,Verification_Link_Source__c,Verified__c+FROM+Registrants__c+WHERE Email__c+=+'{{email}}'",
+							"description": "A SOQL query. Note that you will need to replace spaces with “+” characters in your query string to create a valid URI. An example query parameter string might look like: “SELECT+Name+FROM+MyObject”. If the SOQL query string is invalid, a MALFORMED_QUERY response is returned."
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validate Email Links",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.test(\"validation Status \", function(){\r",
+							"    pm.expect(data.validationStatus).to.equal('pendingAccount');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"flowType\": \"verify\",\n    \"email\": \"{{email}}\",\n    \"verificationCode\": \"{{verificationCode}}\",\n    \"registrantId\": \"{{registrantId}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/validateemaillinks/verify",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"validateemaillinks",
+						"verify"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Request Account 3.2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.test(\"creationStatus \", function(){\r",
+							"    pm.expect(data.creationStatus).to.equal('Success');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"parentId\", function(){\r",
+							"    pm.expect(data.parentId).not.equal(null);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"partner Name\", function(){\r",
+							"    pm.expect(data.partnerName).to.equal('RobertHalf');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"partner EventType \", function(){\r",
+							"    pm.expect(data.partnerEventType).to.equal('ResumeUpload');\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"flowType\": \"verify\",\n    \"candidateEmail\": \"{{email}}\",\n    \"verificationCode\": \"{{verificationCode}}\",\n    \"registrantId\": \"{{registrantId}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/requestaccount?version=v{{appVersion}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"requestaccount"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query Contact",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"//making sure we got 200 OK\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var candidate_id = obj.records[0].Id;\r",
+							"pm.environment.set('contactId', candidate_id);\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v48.0/query/?q=Select+id,lastname,firstname,email,RHD_Access__c,RHD_Status__c,Authorized_to_Work_in_CA__c,RHMP_Authorized_to_Work_in_US__c+FROM+contact+WHERE Email+=+'{{email}}'",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v48.0",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "Select+id,lastname,firstname,email,RHD_Access__c,RHD_Status__c,Authorized_to_Work_in_CA__c,RHMP_Authorized_to_Work_in_US__c+FROM+contact+WHERE Email+=+'{{email}}'",
+							"description": "A SOQL query. Note that you will need to replace spaces with “+” characters in your query string to create a valid URI. An example query parameter string might look like: “SELECT+Name+FROM+MyObject”. If the SOQL query string is invalid, a MALFORMED_QUERY response is returned."
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Candidate Login ",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//get the response from the call made...\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"console.log(jsonResponse.result);\r",
+							"console.log(jsonResponse.returnCode);\r",
+							"\r",
+							"pm.test(\"Result\", function () {\r",
+							"    pm.expect(jsonResponse.result).not.equal(\"null\");\r",
+							"    console.log('error');\r",
+							"});\r",
+							"\r",
+							"//call the second url\r",
+							"const reqObject = {\r",
+							"  url: jsonResponse.result,\r",
+							"  method: 'GET',\r",
+							"  header: 'Content-Type:application/x-www-form-urlencoded'\r",
+							"};\r",
+							"\r",
+							"//build the authorize url\r",
+							"const reqObject2 = {\r",
+							"  url: pm.environment.get('_endpoint') + '/services/oauth2/authorize?client_id=' \r",
+							"                 + pm.environment.get('client_id') + '&redirect_uri='+ pm.environment.get('callbackURI') +'&response_type=token',\r",
+							"  method: 'GET',\r",
+							"  header: 'Content-Type:application/x-www-form-urlencoded'\r",
+							"};\r",
+							"\r",
+							"//nested sendRequest\r",
+							"pm.sendRequest(reqObject, (err, res) => {\r",
+							"    //call the authorize url\r",
+							"    pm.sendRequest(reqObject2,(err, res) => {\r",
+							"      var str = res.text();\r",
+							"      var accessToken = decodeURI(str.substring(str.indexOf('access_token=')+13,\r",
+							"                            str.indexOf('refresh_token')-1)); \r",
+							"      // console.log(accessToken);\r",
+							"      pm.globals.set('authToken',accessToken);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"setTimeout(function(){}, ['20000']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{_endpoint}}/servlet/servlet.loginwidgetcontroller?type=login&username={{email}}&password={{password}}&startURL=/services/oauth2/authorize?client_id={{client_id}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"servlet",
+						"servlet.loginwidgetcontroller"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "login"
+						},
+						{
+							"key": "username",
+							"value": "{{email}}"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}"
+						},
+						{
+							"key": "startURL",
+							"value": "/services/oauth2/authorize?client_id={{client_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FetchNewCandidateProfile",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"    const fetchMyProfileSchema = {",
+							"   \"profile\":{",
+							"      \"personalData\":{",
+							"         \"id\":\"string\",",
+							"         \"firstName\":\"string\",",
+							"         \"lastName\":\"string\",",
+							"         \"address\":{",
+							"            \"addressLine1\":\"string\",",
+							"            \"addressLine2\":\"string\",",
+							"            \"addressLine3\":\"string\",",
+							"            \"city\":\"string\",",
+							"            \"stateProvince\":\"string\",",
+							"            \"county\":\"string\",",
+							"            \"country\":\"string\",",
+							"            \"postalCode\":\"string\"",
+							"         },",
+							"         \"contactInfo\":{",
+							"            \"email\":\"string\",",
+							"            \"phone\":\"string\"",
+							"         },",
+							"         \"mostRecentPosition\":\"string\",",
+							"         \"pictureURL\":\"string\"",
+							"      },",
+							"      \"preferences\":{",
+							"         \"desiredLocation\":\"string\",",
+							"         \"desiredSalary\":\"number\",",
+							"         \"distanceWillingToTravel\":\"number\",",
+							"         \"willingToRelocate\":\"boolean\",",
+							"         \"willingToWorkRemote\":\"boolean\"",
+							"      },",
+							"      \"summary\":\"string\",",
+							"      \"skills\":[",
+							"         \"string\"",
+							"      ],",
+							"      \"jobExperiences\":[",
+							"         {",
+							"            \"title\":\"string\",",
+							"            \"company\":\"string\",",
+							"            \"city\":\"string\",",
+							"            \"state\":\"string\",",
+							"            \"description\":\"string\",",
+							"            \"fromDate\":\"string\",",
+							"            \"toDate\":\"string\",",
+							"            \"currentIndicator\":\"boolean\",",
+							"            \"jobFunction\":\"string\"",
+							"         }",
+							"      ],",
+							"      \"educationHistory\":[",
+							"         {",
+							"            \"degreeType\":\"string\",",
+							"            \"fieldOfStudy\":\"string\",",
+							"            \"schoolName\":\"string\",",
+							"            \"dateAttended\":\"string\"",
+							"         }",
+							"      ]",
+							"   }",
+							"}",
+							"",
+							"pm.test('Schema Validation', function(){",
+							"    var result = tv4.validateResult(JSON.parse(responseBody), fetchMyProfileSchema);",
+							"    if(!result.valid){",
+							"        console.log(result);",
+							"    }",
+							"})",
+							"",
+							"",
+							"var data = JSON.parse(responseBody);",
+							"console.log(data.profile.personalData.id);",
+							"pm.test(\"response must be valid and have a body\", function(){",
+							"     pm.response.to.be.ok; ",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; ",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"   pm.expect(data.returnCode).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Validate Success message\", function () {",
+							"   pm.expect(data.message).to.equal(\"Successful\");",
+							"});",
+							"",
+							"pm.test(\"Validate firstname\", function(){",
+							"     var expected = pm.environment.get(\"firstName\");",
+							"    pm.expect(data.profile.personalData.firstName).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate contact id\", function(){",
+							"     var expected = pm.environment.get(\"contactId\");",
+							"    pm.expect(data.profile.personalData.id).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate People number\", function(){",
+							"    pm.expect(data.profile.TCAST.peopleNumber).not.equal(null)",
+							"});",
+							"",
+							"",
+							"pm.test(\"Validate Suggested Skils\", function(){",
+							"    pm.expect(data.profile.skills.suggestedSkills).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate Current skills\", function(){",
+							"    pm.expect(data.profile.skills.currentSkills).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate email\", function(){",
+							"     var expected = pm.environment.get(\"email\").toLowerCase();",
+							"    pm.expect(data.profile.personalData.contactInfo.email).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate Education History\", function(){",
+							"    pm.expect(data.profile.educationHistory).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate Job Experiences\", function(){",
+							"    pm.expect(data.profile.jobExperiences).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate Desired Location Zip\", function(){",
+							"     var expected = pm.environment.get(\"USPostalCode\");",
+							"    pm.expect(data.profile.preferences.desiredLocationZip).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"validate RHD and Authorize flags\", () => {",
+							"    //parse the response json and test three properties",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(data.profile.settings.RHDStatus).to.eql('Active');",
+							"    pm.expect(data.profile.settings.RHDAccess).to.eql('Enabled');",
+							"    pm.expect(data.profile.preferences.authorizedToWorkCA).to.be.false;",
+							"    pm.expect(data.profile.preferences.authorizedToWorkUS).to.be.true;",
+							"});",
+							"",
+							"pm.test(\"Validate Onboarding stage2\", function(){",
+							"    pm.expect(data.profile.onboarding.stage2).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/profile",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Profile - Contact Info",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{authToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"personalData\": {\n        \"contactInfo\": {\n            \"phone\": \"(925) 666-4444\"\n        }\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/profile",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"profile"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Profile - Work Experience",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{authToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"jobExperiences\": [\n        {\n            \"toDate\": \"2019-05-31T00:00:00.000Z\",\n            \"title\": \"Systems Engineer Analyst\",\n            \"status\": \"Complete\",\n            \"state\": \"LA\",\n            \"jobFunction\": null,\n            \"fromDate\": \"2018-03-01T00:00:00.000Z\",\n            \"description\": \"Java and salsforce admin developer\",\n            \"currentIndicator\": false,\n            \"company\": \"Robert half INC, NY\",\n            \"city\": \"San Ramon\"\n        },\n        {\n            \"toDate\": null,\n            \"title\": \"Software QA Engineer\",\n            \"status\": \"Complete\",\n            \"state\": \"CA\",\n            \"jobFunction\": null,\n            \"fromDate\": \"2018-01-01T00:00:00.000Z\",\n            \"description\": \"Description: Worked closely with the project manager and the development team, created Test plans and Test cases for new features and making sure that the requirements are met before and after implementation of the features.\",\n            \"currentIndicator\": true,\n            \"company\": \"RagingWire Data Center\",\n            \"city\": \"Sacramento\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/profile",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"profile"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Profile - Education",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{authToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"educationHistory\": [\n        {\n            \"status\": \"Complete\",\n            \"schoolName\": \"MIT university\",\n            \"fieldOfStudy\": \"Computer Science\",\n            \"educationType\": \"Education\",\n            \"degreeType\": \"masters\",\n            \"dateAttended\": \"2018-01-01T00:00:00.000Z\"\n        },\n        {\n            \"status\": \"Complete\",\n            \"schoolName\": \"Cambridge university\",\n            \"fieldOfStudy\": \"Computer Science\",\n            \"educationType\": \"Education\",\n            \"degreeType\": \"Bachelors\",\n            \"dateAttended\": \"2014-01-01T00:00:00.000Z\"\n        }\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/profile",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"profile"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Profile - Skills",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{authToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"skills\": {\n        \"suggestedSkills\": [\n            \"Ajax\",\n            \"Apache Struts\",\n            \"Automation\",\n            \"CSS\",\n            \"Defect Management\",\n            \"Deliverable\",\n            \"Eclipse\",\n            \"Framework\",\n            \"Hibernate ORM\",\n            \"HTML\",\n            \"Integration\",\n            \"JDBC\",\n            \"jQuery\",\n            \"JSP\",\n            \"Metric Reporting\",\n            \"Offshore\",\n            \"Oracle\",\n            \"Performance\",\n            \"Quality Center\",\n            \"Regression Analysis\",\n            \"Release Process\",\n            \"Servlets\",\n            \"Sprint Framework\",\n            \"SQL\",\n            \"Test Data\",\n            \"Test Execution\",\n            \"Test Scripts\",\n            \"Test Strategy\",\n            \"UAT\",\n            \"Web App\",\n            \"XML Technologies\"\n        ],\n        \"currentSkills\": [\n            \"Salesforce\",\n            \"Company\",\n            \"Computer Sciences\",\n            \"Database\",\n            \"Database Development\",\n            \"Development\",\n            \"GitHub\",\n            \"Implement Strategies\",\n            \"Implementation\",\n            \"J2EE\",\n            \"J2EE - Java 2 Enterprise Edition\",\n            \"Java Applet\",\n            \"Java Servlet\",\n            \"Java Swing\",\n            \"JavaBeans\",\n            \"JavaScript\",\n            \"Mobile Applications\",\n            \"MySQL\",\n            \"Planning Processes\",\n            \"Project Management\",\n            \"QA\",\n            \"QA - Quality Assurance\",\n            \"Research & Development\",\n            \"Selenium\",\n            \"Test Cases\",\n            \"Testing - IT\",\n            \"C++\"\n        ]\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/profile",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"profile"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Candidate Profile",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"    const fetchMyProfileSchema = {",
+							"   \"profile\":{",
+							"      \"personalData\":{",
+							"         \"id\":\"string\",",
+							"         \"firstName\":\"string\",",
+							"         \"lastName\":\"string\",",
+							"         \"address\":{",
+							"            \"addressLine1\":\"string\",",
+							"            \"addressLine2\":\"string\",",
+							"            \"addressLine3\":\"string\",",
+							"            \"city\":\"string\",",
+							"            \"stateProvince\":\"string\",",
+							"            \"county\":\"string\",",
+							"            \"country\":\"string\",",
+							"            \"postalCode\":\"string\"",
+							"         },",
+							"         \"contactInfo\":{",
+							"            \"email\":\"string\",",
+							"            \"phone\":\"string\"",
+							"         },",
+							"         \"mostRecentPosition\":\"string\",",
+							"         \"pictureURL\":\"string\"",
+							"      },",
+							"      \"preferences\":{",
+							"         \"desiredLocation\":\"string\",",
+							"         \"desiredSalary\":\"number\",",
+							"         \"distanceWillingToTravel\":\"number\",",
+							"         \"willingToRelocate\":\"boolean\",",
+							"         \"willingToWorkRemote\":\"boolean\"",
+							"      },",
+							"      \"summary\":\"string\",",
+							"      \"skills\":[",
+							"         \"string\"",
+							"      ],",
+							"      \"jobExperiences\":[",
+							"         {",
+							"            \"title\":\"string\",",
+							"            \"company\":\"string\",",
+							"            \"city\":\"string\",",
+							"            \"state\":\"string\",",
+							"            \"description\":\"string\",",
+							"            \"fromDate\":\"string\",",
+							"            \"toDate\":\"string\",",
+							"            \"currentIndicator\":\"boolean\",",
+							"            \"jobFunction\":\"string\"",
+							"         }",
+							"      ],",
+							"      \"educationHistory\":[",
+							"         {",
+							"            \"degreeType\":\"string\",",
+							"            \"fieldOfStudy\":\"string\",",
+							"            \"schoolName\":\"string\",",
+							"            \"dateAttended\":\"string\"",
+							"         }",
+							"      ]",
+							"   }",
+							"}",
+							"",
+							"pm.test('Schema Validation', function(){",
+							"    var result = tv4.validateResult(JSON.parse(responseBody), fetchMyProfileSchema);",
+							"    if(!result.valid){",
+							"        console.log(result);",
+							"    }",
+							"})",
+							"",
+							"",
+							"var data = JSON.parse(responseBody);",
+							"console.log(data.profile.personalData.id);",
+							"pm.test(\"response must be valid and have a body\", function(){",
+							"     pm.response.to.be.ok; ",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; ",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"   pm.expect(data.returnCode).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Validate Success message\", function () {",
+							"   pm.expect(data.message).to.equal(\"Successful\");",
+							"});",
+							"",
+							"pm.test(\"Validate firstname\", function(){",
+							"     var expected = pm.environment.get(\"firstName\");",
+							"    pm.expect(data.profile.personalData.firstName).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate contact id\", function(){",
+							"     var expected = pm.environment.get(\"contactId\");",
+							"    pm.expect(data.profile.personalData.id).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate People number\", function(){",
+							"    pm.expect(data.profile.TCAST.peopleNumber).not.equal(null)",
+							"});",
+							"",
+							"",
+							"pm.test(\"Validate Suggested Skils\", function(){",
+							"    pm.expect(data.profile.skills.suggestedSkills).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate Current skills\", function(){",
+							"    pm.expect(data.profile.skills.currentSkills).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate email\", function(){",
+							"     var expected = pm.environment.get(\"email\").toLowerCase();",
+							"    pm.expect(data.profile.personalData.contactInfo.email).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate Education History\", function(){",
+							"    pm.expect(data.profile.educationHistory).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate Job Experiences\", function(){",
+							"    pm.expect(data.profile.jobExperiences).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate Desired Location Zip\", function(){",
+							"     var expected = pm.environment.get(\"USPostalCode\");",
+							"    pm.expect(data.profile.preferences.desiredLocationZip).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate Updated Contact Info\", function(){",
+							"        pm.expect(data.profile.personalData.contactInfo.phone).to.equal(\"(925) 666-4444\");",
+							"});",
+							"",
+							"pm.test(\"Validate Updated Job Info\", function(){",
+							"        pm.expect(data.profile.jobExperiences[0].title).to.equal(\"Software QA Engineer\");",
+							"});",
+							"",
+							"pm.test(\"Validate Updated Education Info\", function(){",
+							"        pm.expect(data.profile.educationHistory[0].schoolName).to.equal(\"MIT university\");",
+							"});",
+							"",
+							"pm.test(\"Validate Updated Skills\", function(){",
+							"        pm.expect(data.profile.skills.currentSkills[0]).to.equal(\"C++\");",
+							"});",
+							"",
+							"pm.test(\"Validate Onboarding stage2\", function(){",
+							"        pm.expect(data.profile.onboarding.stage2).to.be.true;",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/profile",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Get Recommendations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData=JSON.stringify(pm.response.json());\r",
+							"const obj=JSON.parse(jsonData);\r",
+							" \r",
+							"console.log(obj.jobRecommendations[0].jobDetail.sf_jpsid);\r",
+							" \r",
+							"pm.environment.set('saveJobId', obj.jobRecommendations[1].jobDetail.sf_jpsid);\r",
+							"pm.environment.set('saveJobPostingId', obj.jobRecommendations[1].jobDetail.sf_jo_number);\r",
+							"pm.environment.set('saveJobTitle', obj.jobRecommendations[0].title);\r",
+							"\r",
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Validate Job Recommendations\", function(){\r",
+							"    pm.expect(data.jobRecommendations).not.equal(null)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Job Number\", function(){\r",
+							"    pm.expect(data.jobRecommendations[0].jobDetail.unique_job_number).not.equal(null)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Job Id\", function(){\r",
+							"    pm.expect(data.jobRecommendations[0].jobDetail.sf_jpsid).not.equal(null)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"locale\": \"{{locale_us}}\",\n\t\"location\": \"{{USPostalCode}}\"\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/jobs/recommendations/zengine?version=v{{appVersion}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"jobs",
+						"recommendations",
+						"zengine"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Save Job",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"jobstatuses\": [\r\n        {\r\n            \"sf_jpsid\": \"{{saveJobId}}\",  \r\n            \"status\":\"save\" \r\n        }\r\n    ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/jobs/save?version=v{{appVersion}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"jobs",
+						"save"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Saved Jobs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Saved Job ID\", function () {\r",
+							"   var expected = pm.environment.get(\"saveJobId\");\r",
+							"   pm.expect(data.savedJobslist[0].sf_jpsid).to.equal(expected);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{authToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/jobs/statuses?version=v{{appVersion}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"jobs",
+						"statuses"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Job Apply",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"employmentType\": \"Temp\",\n    \"eventType\": \"Mobile\",\n    \"partnerCandidateId\": \"{{contactId}}\",\n    \"jp_sfid\": \"{{saveJobId}}\",\n    \"partnerName\": \"RobertHalfMobileApp\",\n    \"locale\": \"{{locale_us}}\",\n    \"candidateCountryCode\": \"{{CountryInitials}}\",\n    \"urlCountryCode\": \"{{CountryInitials}}\",\n    \"caslOptIn\": \"N\",\n    \"partnerFlagNewCandidate\": \"Y\",\n    \"urlSfLobCode\": \"{{lobCode}}\",\n    \"partnerEventType\": \"JobApplyRH\",\n    \"jobPostingId\": \"{{saveJobPostingId}}\",\n    \"partnerMessageId\": \"RobertHalfMSGId\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/JobApply?version=v{{appVersion}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"JobApply"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Job Status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Applied Job ID\", function () {\r",
+							"   var expected = pm.environment.get(\"saveJobId\");\r",
+							"   pm.expect(data.appliedJobslist[0].sf_jpsid).to.equal(expected);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{authToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/jobs/statuses?version=v{{appVersion}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"jobs",
+						"statuses"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Similar Jobs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData=JSON.stringify(pm.response.json());\r",
+							"const obj=JSON.parse(jsonData);\r",
+							" \r",
+							"console.log(obj.jobs[0].sf_jo_number);\r",
+							" \r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set('saveJobPostingId', obj.jobs[0].sf_jo_number);\r",
+							"pm.environment.set('saveSimilarJobId', obj.jobs[0].sf_jpsid);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "oauth2",
+					"oauth2": [
+						{
+							"key": "accessToken",
+							"value": "{{authToken}}",
+							"type": "string"
+						},
+						{
+							"key": "tokenType",
+							"value": "Bearer",
+							"type": "string"
+						},
+						{
+							"key": "addTokenTo",
+							"value": "header",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"jobPostingId\": \"{{saveJobId}}\",\n    \"locationFilter\": {\n        \"locationstring\": \"{{USPostalCode}}\"\n    },\n    \"locale\": \"{{locale_us}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/jobs/similar?version=v{{appVersion}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"jobs",
+						"similar"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "v{{appVersion}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Job Search - ITMCC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{mobile_search_api_key}}",
+							"type": "string"
+						},
+						{
+							"key": "in",
+							"value": "header",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "x-api-key",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": "B0q5TnBcCx2WPggqh5oQf8odinnFx2bq9qTCRTzp"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"sortby\": \"RELEVANCE_DESC\",\n    \"location\": \"{{USPostalCode}}\",\n    \"country\": \"{{CountryInitials}}\",\n    \"distance\": 50,\n    \"source\": [\n        \"Salesforce\"\n    ],\n    \"pagesize\": \"35\",\n    \"pagenumber\": \"1\",\n    \"languagecodes\": [\n        \"{{locale_us}}\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{mobile_search_url}}/mobile-search/jobs",
+					"host": [
+						"{{mobile_search_url}}"
+					],
+					"path": [
+						"mobile-search",
+						"jobs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Job Alerts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set('subscriptionId', data.subscriptionId);\r",
+							"\r",
+							"pm.test(\"Validate Subscription Id\", function () {\r",
+							"   pm.expect(data.subscriptionId).not.equal(null);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"subscriptionSource\": \"Mobile\",\n    \"email\": \"{{email}}\",\n    \"keywords\": \"{{saveJobTitle}}\",\n    \"location\": \"{{USPostalCode}}\",\n    \"countryCode\": \"{{CountryInitials}}\",\n    \"emailFrequency\": \"W\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/job/alerts/{{USPostalCode}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"job",
+						"alerts",
+						"{{USPostalCode}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Job Alerts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Job Alert\", function(){\r",
+							"    var expected = pm.environment.get('subscriptionId');\r",
+							"    pm.expect(data.items[0].subscriptionId).to.equal(expected);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/job/alerts?candidateEmail={{email}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"job",
+						"alerts"
+					],
+					"query": [
+						{
+							"key": "candidateEmail",
+							"value": "{{email}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Put Job Alerts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Job Alert\", function(){\r",
+							"    var expected = pm.environment.get('subscriptionId');\r",
+							"    pm.expect(data.subscriptionId).to.equal(expected);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n   \"subscriptionId\": \"{{subscriptionId}}\",\n   \"emailFrequency\": \"W\",\n   \"status\": \"I\"\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/job/alerts?candidateEmail={{email}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"job",
+						"alerts"
+					],
+					"query": [
+						{
+							"key": "candidateEmail",
+							"value": "{{email}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Job Alerts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Message\", function(){\r",
+							"    pm.expect(data.message).to.equal('No job alerts found for this email address.');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/job/alerts?candidateEmail={{email}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"job",
+						"alerts"
+					],
+					"query": [
+						{
+							"key": "candidateEmail",
+							"value": "{{email}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Change Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"newPassword\": \"{{newPassword}}\",\r\n    \"verifyPassword\": \"{{newPassword}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/password/change",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"password",
+						"change"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login with changed password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//get the response from the call made...\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"console.log(jsonResponse.result);\r",
+							"console.log(jsonResponse.returnCode);\r",
+							"\r",
+							"pm.test(\"Result\", function () {\r",
+							"    pm.expect(jsonResponse.result).not.equal(\"null\");\r",
+							"    console.log('error');\r",
+							"});\r",
+							"\r",
+							"//call the second url\r",
+							"const reqObject = {\r",
+							"  url: jsonResponse.result,\r",
+							"  method: 'GET',\r",
+							"  header: 'Content-Type:application/x-www-form-urlencoded'\r",
+							"};\r",
+							"\r",
+							"//build the authorize url\r",
+							"const reqObject2 = {\r",
+							"  url: pm.environment.get('_endpoint') + '/services/oauth2/authorize?client_id=' \r",
+							"                 + pm.environment.get('client_id') + '&redirect_uri='+ pm.environment.get('callbackURI') +'&response_type=token',\r",
+							"  method: 'GET',\r",
+							"  header: 'Content-Type:application/x-www-form-urlencoded'\r",
+							"};\r",
+							"\r",
+							"//nested sendRequest\r",
+							"pm.sendRequest(reqObject, (err, res) => {\r",
+							"    //call the authorize url\r",
+							"    pm.sendRequest(reqObject2,(err, res) => {\r",
+							"      var str = res.text();\r",
+							"      var accessToken = decodeURI(str.substring(str.indexOf('access_token=')+13,\r",
+							"                            str.indexOf('refresh_token')-1)); \r",
+							"      // console.log(accessToken);\r",
+							"      pm.globals.set('authToken',accessToken);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{_endpoint}}/servlet/servlet.loginwidgetcontroller?type=login&username={{email}}&password={{newPassword}}&startURL=/services/oauth2/authorize?client_id={{client_id}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"servlet",
+						"servlet.loginwidgetcontroller"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "login"
+						},
+						{
+							"key": "username",
+							"value": "{{email}}"
+						},
+						{
+							"key": "password",
+							"value": "{{newPassword}}"
+						},
+						{
+							"key": "startURL",
+							"value": "/services/oauth2/authorize?client_id={{client_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Revert Change Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"   pm.expect(data.returnCode).to.equal(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"newPassword\": \"{{password}}\",\r\n    \"verifyPassword\": \"{{password}}\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/password/change",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"password",
+						"change"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//get the response from the call made...\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"console.log(jsonResponse.result);\r",
+							"console.log(jsonResponse.returnCode);\r",
+							"\r",
+							"pm.test(\"Result\", function () {\r",
+							"    pm.expect(jsonResponse.result).not.equal(\"null\");\r",
+							"    console.log('error');\r",
+							"});\r",
+							"\r",
+							"//call the second url\r",
+							"const reqObject = {\r",
+							"  url: jsonResponse.result,\r",
+							"  method: 'GET',\r",
+							"  header: 'Content-Type:application/x-www-form-urlencoded'\r",
+							"};\r",
+							"\r",
+							"//build the authorize url\r",
+							"const reqObject2 = {\r",
+							"  url: pm.environment.get('_endpoint') + '/services/oauth2/authorize?client_id=' \r",
+							"                 + pm.environment.get('client_id') + '&redirect_uri='+ pm.environment.get('callbackURI') +'&response_type=token',\r",
+							"  method: 'GET',\r",
+							"  header: 'Content-Type:application/x-www-form-urlencoded'\r",
+							"};\r",
+							"\r",
+							"//nested sendRequest\r",
+							"pm.sendRequest(reqObject, (err, res) => {\r",
+							"    //call the authorize url\r",
+							"    pm.sendRequest(reqObject2,(err, res) => {\r",
+							"      var str = res.text();\r",
+							"      var accessToken = decodeURI(str.substring(str.indexOf('access_token=')+13,\r",
+							"                            str.indexOf('refresh_token')-1)); \r",
+							"      // console.log(accessToken);\r",
+							"      pm.globals.set('authToken',accessToken);\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{_endpoint}}/servlet/servlet.loginwidgetcontroller?type=login&username={{email}}&password={{password}}&startURL=/services/oauth2/authorize?client_id={{client_id}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"servlet",
+						"servlet.loginwidgetcontroller"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "login"
+						},
+						{
+							"key": "username",
+							"value": "{{email}}"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}"
+						},
+						{
+							"key": "startURL",
+							"value": "/services/oauth2/authorize?client_id={{client_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Email Preferences",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());",
+							"const obj = JSON.parse(jsonData);",
+							"",
+							"pm.test(\"response must be valid and have a body\", function(){",
+							"     pm.response.to.be.ok; ",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; ",
+							"});",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Validate Successful response \", () => {",
+							"    pm.expect(obj.message).to.eql('Successful');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/preferencecenter",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"preferencecenter"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Forgot Username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"pm.test(\"response must be valid and have a body\", function(){\r",
+							"     pm.response.to.be.ok; \r",
+							"     pm.response.to.be.withBody;\r",
+							"     pm.response.to.be.json; \r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Successful response \", () => {\r",
+							"    pm.expect(obj.message).to.eql('SUCCESS');\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/password/forgot?email={{email}}&country={{CountryInitials}}&locale={{locale_us}}&language={{locale_us}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"password",
+						"forgot"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{email}}"
+						},
+						{
+							"key": "country",
+							"value": "{{CountryInitials}}"
+						},
+						{
+							"key": "locale",
+							"value": "{{locale_us}}"
+						},
+						{
+							"key": "language",
+							"value": "{{locale_us}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Forgot Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"pm.test(\"response must be valid and have a body\", function(){\r",
+							"     pm.response.to.be.ok; \r",
+							"     pm.response.to.be.withBody;\r",
+							"     pm.response.to.be.json; \r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Successful response \", () => {\r",
+							"    pm.expect(obj.message).to.eql('SUCCESS');\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/password/forgot?email={{email}}&country={{CountryInitials}}&locale={{locale_us}}&language={{locale_us}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"password",
+						"forgot"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{email}}"
+						},
+						{
+							"key": "country",
+							"value": "{{CountryInitials}}"
+						},
+						{
+							"key": "locale",
+							"value": "{{locale_us}}"
+						},
+						{
+							"key": "language",
+							"value": "{{locale_us}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
