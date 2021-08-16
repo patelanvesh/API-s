@@ -1,0 +1,24 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "API automation with newman",
+  "scripts": {
+    "api-tests": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/patelanvesh/API-s.git"
+  },
+  "keywords": [
+    "Postman",
+    "CI"
+  ],
+  "author": "Anvesh",
+  "bugs": {
+    "url": "https://github.com/patelanvesh/API-s/issues"
+  },
+  "homepage": "https://github.com/patelanvesh/API-s#readme",
+  "dependencies": {
+    "newman": "^5.2.4"
+  }
+}
