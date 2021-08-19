@@ -1,0 +1,748 @@
+{
+	"info": {
+		"_postman_id": "439372ba-d157-45a1-91e4-8b774488a591",
+		"name": "UnAuthenticated_Mobile_API-US",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "authConfig-setBaseURL",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"console.log(pm.environment.get(\"environment\"));\r",
+							"for (var i = 0; i<data.environments.length;i++){\r",
+							"   if(data.environments[i].identifier == pm.environment.get(\"environment\")){\r",
+							"        pm.environment.set(\"base_url\", data.environments[i].baseURL);\r",
+							"   }\r",
+							"      \r",
+							"}\r",
+							"   console.log(\"baseURL is set as: \"+pm.environment.get(\"base_url\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/authconfig",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"authconfig"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "authConfig-getDetails",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"client_id\", data.environmentDetails.salesforce.clientID);\r",
+							"pm.environment.set(\"mobile_search_url\", data.environmentDetails.mobileSearch.baseURL);\r",
+							"pm.environment.set(\"mobile_search_api_key\", data.environmentDetails.mobileSearch.apiKey);\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var chars = 'abcdefghijklmnopqrstuvwxyz1234567890';\r",
+							"var string = '';\r",
+							"var firstName = '';\r",
+							"var lastName = '';\r",
+							"\r",
+							"//genernate random email\r",
+							"for(var ii=0; ii<5; ii++){\r",
+							"    string += chars[Math.floor(Math.random() * chars.length)];\r",
+							"}\r",
+							"\r",
+							"//Last Name: QA+Test + Testers Initials + NN (Sequential number)\r",
+							"var sequenceNumber = Number(pm.environment.get('LastNameCounter'));\r",
+							"\r",
+							"var randmonEmail = 'QATEST' + string + sequenceNumber +  '@Automation.com';\r",
+							"pm.environment.set('email',randmonEmail);\r",
+							"pm.environment.set('locale_ca', 'en_CA');\r",
+							"pm.environment.set('CACountryInitials', 'CA');\r",
+							"pm.environment.set('locale_us', 'en_US');\r",
+							"pm.environment.set('CountryInitials', 'US');\r",
+							"\r",
+							"\r",
+							"\r",
+							"console.log(encodeURIComponent(randmonEmail));\r",
+							"pm.environment.set('encode_email',encodeURIComponent(randmonEmail));\r",
+							"\r",
+							"//First Name:QA + [2 letter country ISO  abbreviation]        \r",
+							"//create first name\r",
+							"pm.environment.set('firstName','QA' + pm.environment.get('CountryInitials') + 'UnAuth');\r",
+							"\r",
+							"var lastName = 'QATEST' + string + sequenceNumber;\r",
+							"pm.environment.set('lastName',lastName);  \r",
+							"pm.environment.set('LastNameCounter',sequenceNumber + 1);  \r",
+							"\r",
+							"//random phone number....find a good phone number\r",
+							"do {\r",
+							"\tphoneNumber = Math.floor(Math.pow(10, 9) + Math.random() * 9 * Math.pow(10,9));\r",
+							"\tvar phoneRegex = /^\\(?([2-9]{3})\\)?[-. ]?([2-9]{3})[-. ]?([0-9]{4})$/;\r",
+							"\tconsole.log(phoneRegex.test(phoneNumber));\r",
+							"  \t// console.log(phoneNumber);\r",
+							"}while (!phoneRegex.test(phoneNumber));\r",
+							"\r",
+							"//format phone to desired \r",
+							"phoneNumber = formatPhoneNumber(phoneNumber);\r",
+							"console.log(phoneNumber);\r",
+							"pm.environment.set('phone',phoneNumber);\r",
+							"pm.environment.set('formattedPhone',phoneNumber);\r",
+							"\r",
+							"\r",
+							"//set source\r",
+							"pm.environment.set('sourceId','RH App');\r",
+							"\r",
+							"//now generate verification code\r",
+							"var rString = generateVerificationCode();\r",
+							"// console.log(rString);\r",
+							"//set source\r",
+							"pm.environment.set('randomVerificationCode',rString);\r",
+							"\r",
+							"pm.environment.set('todayDate',generateDate());\r",
+							"pm.environment.set('futureExpiryDate',generateDate(15));\r",
+							"\r",
+							"//format phone number\r",
+							"function formatPhoneNumber(phoneNumberString) {\r",
+							"  var cleaned = ('' + phoneNumberString).replace(/\\D/g, '')\r",
+							"  var match = cleaned.match(/^(\\d{3})(\\d{3})(\\d{4})$/)\r",
+							"  if (match) {\r",
+							"    return '(' + match[1] + ') ' + match[2] + '-' + match[3]\r",
+							"  }\r",
+							"  return null\r",
+							"}\r",
+							"\r",
+							"//generate verification code\r",
+							"function generateVerificationCode() {\r",
+							"    var length = 40;\r",
+							"    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';\r",
+							"    var result = '';\r",
+							"    for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"//Generate date\r",
+							"function generateDate(strDays){\r",
+							"    const dtDate = new Date();\r",
+							"    if (strDays != undefined){\r",
+							"        dtDate.addDays(strDays);\r",
+							"    }\r",
+							"    return dtDate.toISOString();\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/authconfig?getdetails=TRUE",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"authconfig"
+					],
+					"query": [
+						{
+							"key": "getdetails",
+							"value": "TRUE"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SOAP Login - Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var result = xml2Json(pm.response.text())[\"soapenv:Envelope\"][\"soapenv:Body\"].loginResponse.result;",
+							"var url = result.serverUrl.split(\"/\");",
+							"pm.environment.set(\"admin_accessToken\", result.sessionId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "login",
+						"type": "text"
+					},
+					{
+						"key": "charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<env:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <env:Body>\n    <n1:login xmlns:n1=\"urn:partner.soap.sforce.com\">\n      <n1:username>{{admin_username}}</n1:username>\n      <n1:password>{{admin_password}}{{admin_securityToken}}</n1:password>\n    </n1:login>\n  </env:Body>\n</env:Envelope>"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/Soap/u/v48.0",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"Soap",
+						"u",
+						"v48.0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Mobile  Job Search",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"var data = JSON.parse(responseBody);\r",
+							"if(data.jobs.length>0)\r",
+							"    pm.environment.set(\"job_number\", data.jobs[0].sf_jo_number);\r",
+							"    pm.environment.set(\"job_posting_id\", data.jobs[0].sf_jpsid);\r",
+							"\r",
+							"pm.test('Number of jobs returned = ' + data.jobs.length, function () {\r",
+							"    pm.expect(data.jobs.length).to.be.above(0);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": "{{mobile_search_api_key}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"distance\": \"50\",\n  \"country\": \"{{CountryInitials}}\",\n  \"pagenumber\": \"1\",\n  \"source\": [\n    \"Salesforce\"\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{mobile_search_url}}/mobile-search/jobs",
+					"host": [
+						"{{mobile_search_url}}"
+					],
+					"path": [
+						"mobile-search",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "keywords",
+							"value": "dublin",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch Job Details SFCC",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"The response has all properties\", () => {",
+							"    //parse the response json and test three properties",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.status).to.eql('Posted');",
+							"    pm.expect(responseJson.skills).not.equal(null);",
+							"    pm.expect(responseJson.source).to.equal('Salesforce');",
+							"    pm.expect(responseJson.jobtitle).not.equal(null);",
+							"    pm.expect(responseJson.branch).not.equal(null);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/job/details?id={{job_posting_id}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"job",
+						"details"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{job_posting_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Parse Resume",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"The response has all properties\", () => {",
+							"    //parse the response json and test three properties",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson.experience).not.equal(null);",
+							"    pm.expect(responseJson.email).not.equal(null);",
+							"    pm.expect(responseJson.education).not.equal(null);",
+							"    pm.expect(responseJson.lastName).not.equal(null);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"contentType\": \"application/vnd.openxmlformats-officedocument.wordprocessingml.document\",\n    \"base64Data\": \"UUFVUyBRQVRFU1RMWk0NCjI2MTMgQ2FtaW5vIFJhbW9uLCBTYW4gUmFtb24sIENBIDk0NTgzDQogIHx8ICg5MjUpIDY5NS05OTk5IHx8IHFhdXNxYXRlc3RtMDRAZ21haWwuY29tICAgIA0KU09GVFdBUkUgUVVBTElUWSBBU1NVUkFOQ0UgRU5HSU5FRVIgDQpTVU1NQVJZOiANCiAyICsgeWVhcnMgb2YgZXhwZXJpZW5jZSBpbiBRdWFsaXR5IEFzc3VyYW5jZSBvZiB2YXJpb3VzIGZpZWxkcyBpbmNsdWRpbmcgV2ViIGFuZCBNb2JpbGUgc29mdHdhcmUglSBQcm9maWNpZW50IGluIE1hbnVhbCBhbmQgQXV0b21hdGVkIHNvZnR3YXJlIHRlc3RpbmcgaW4gSmF2YSB3aXRoIFNlbGVuaXVtIFdlYkRyaXZlci4glSBFeHBlcmllbmNlZCBpbiBTY3J1bSBBZ2lsZSwgYW5kIFdhdGVyZmFsbCBNZXRob2RvbG9naWVzIHdpdGggYSBzb2xpZCB1bmRlcnN0YW5kaW5nIGFuZCBwcmFjdGljYWwgZXhwZXJpZW5jZSBvZiBzb2Z0d2FyZSBkZXZlbG9wbWVudCBsaWZlIGN5Y2xlIChTRExDKSwgdGVzdGluZyBtZXRob2RvbG9naWVzLiCVIEhhbmRzLW9uIGV4cGVyaWVuY2UgaW4gd3JpdGluZyB0ZXN0IHN1aXRlcyB0ZXN0IHBsYW4gYW5kIHRlc3QgY2FzZXMgZm9yIG5ldyBwcm9kdWN0IGZlYXR1cmVzLCByZXBvcnRpbmcgYW5kIHZlcmlmeWluZyBzb2Z0d2FyZSBkZWZlY3RzLCBRQSB0ZXJtaW5vbG9neSBhbmQgbG9jYWxpemF0aW9uIHByb2Nlc3Nlcy4glSBXb3JrIGV4cGVyaWVuY2Ugd2l0aCBNeVNRTCBkYXRhYmFzZXMuIJUgRXhwZXJpZW5jZSB3aXRoIGRpZmZlcmVudCB0eXBlcyBvZiB0ZXN0aW5nIHN1Y2ggYXMgUmVncmVzc2lvbiwgRnVuY3Rpb25hbCwgV2hpdGUtYm94IFRlc3RpbmcgYW5kIEJsYWNrYm94IFRlc3RpbmcglSBBcm1lZCB3aXRoIHNvbGlkIGNvbW11bmljYXRpb24sIG9yZ2FuaXphdGlvbmFsLCBtdWx0aXRhc2tpbmcsIGFuZCBpbnRlcnBlcnNvbmFsIHNraWxscy4gIJUgSWYgeW91IGFyZSBsb29raW5nIGZvciBzb21lb25lIHdobyBpcyBUZWNobmljYWwgaW4gbmF0dXJlIGJ1dCBmb2N1c2VkIG9uIFF1YWxpdHkgaW4gbWVudGFsaXR5IGFuZCBhcHByb2FjaCwgSSBtYXkgYmUgb2YgdmFsdWUgYW5kIGdvb2QgYWRkaXRpb24gdG8geW91ciB0ZWFtLiANCiANClRFQ0hOSUNBTCBTS0lMTFM6IJUgTGFuZ3VhZ2VzOiAgICAgICAgIEphdmEsIEhUTUwsIFhNTCwgU1FMIJUgVGVzdCBBdXRvbWF0aW9uOiAgICBTZWxlbml1bSwgVGVzdE5HLCBYQ29kZSwgICAgQW5kcm9pZCwgU3R1ZGlvLCBKZW5raW5zLCBBbGx1cmUglSBDSSBhbmQgQnVpbGQgVG9vbHM6IEplbmtpbnMsIE1hdmVuIJUgRGF0YWJhc2U6ICAgICAgICAgTXlTUUwgDQqVIFZlcnNpb24gQ29udHJvbDogICAgR2l0LCBHaXRIdWIglSBWaXJ0dWFsaXphdGlvbjogICAgICAgVmlydHVhbCBCb3gglSBRQSBUcmFja2luZzogICAgICAgIEpJUkEsIEJ1Z3ppbGxhLCBUZXN0UmFpbCCVIE1vYmlsZSBQbGF0Zm9ybXM6ICBpT1MsIEFuZHJvaWQgT1MglSBQbGF0Zm9ybXM6ICAgICAgICAgICAgICBXaW5kb3dzLCBMaW51eCwgTUFDIE9TIFgNCiANClBST0ZFU1NJT05BTCBFWFBFUklFTkNFLiANCiANCpUJQ29tcGFueSBOYW1lOiBSYWdpbmdXaXJlIERhdGEgQ2VudGVyIA0KlQlMb2NhdGlvbjogU2FjcmFtZW50bywgQ0EgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICANCpUJRHVyYXRpb246IDAxLzIwMTggliBQcmVzZW50IA0KlQlKb2IgVGl0bGU6IFNvZnR3YXJlIFFBIEVuZ2luZWVyIA0KDQoNCpUJRGVzY3JpcHRpb246IFdvcmtlZCBjbG9zZWx5IHdpdGggdGhlIHByb2plY3QgbWFuYWdlciBhbmQgdGhlIGRldmVsb3BtZW50IHRlYW0sIGNyZWF0ZWQgVGVzdCBwbGFucyBhbmQgVGVzdCBjYXNlcyBmb3IgbmV3IGZlYXR1cmVzIGFuZCBtYWtpbmcgc3VyZSB0aGF0IHRoZSByZXF1aXJlbWVudHMgYXJlIG1ldCBiZWZvcmUgYW5kIGFmdGVyIGltcGxlbWVudGF0aW9uIG9mIHRoZSBmZWF0dXJlcy4gDQoNCiANCkVEVUNBVElPTiANCg0KRGVncmVlOiBNYXN0ZXIncw0KU2Nob29sIE5hbWU6ICBBQkMgdW5pdmVyc2l0eQ0KR3JhZHVhdGVkIGluIDIwMTgNCk1ham9yOiBDb21wdXRlciBTY2llbmNlDQo=\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/parseresume?version={{version}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"parseresume"
+					],
+					"query": [
+						{
+							"key": "version",
+							"value": "{{version}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Job Apply",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"setTimeout(function(){}, ['70000']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"jobPostingId\": \"{{job_number}}\",\n  \"jp_sfid\": \"{{job_posting_id}}\",\n  \"firstName\": \"{{firstName}}\",\n  \"lastName\": \"{{lastName}}\",\n  \"email\": \"{{email}}\",\n  \"phone\": \"{{formattedPhone}}\",\n  \"candidateCountryCode\": \"{{CountryInitials}}\",\n  \"postalCode\": \"{{USPostalCode}}\",\n  \"eventType\": \"ResumeUpload\",\n  \"partnerMessageId\":\"RobertHalfMSGId\", \n  \"partnerName\":\"RobertHalfMobileApp\",\n  \"partnerFileName\": \"{{firstName}}_{{lastName}}.txt\",\n  \"partnerEventType\":\"JobApplyRH\",\n  \"partnerResumeMimeType\": \"text/plain\",\n   \"caslOptIn\": \"Y\",\n  \"employmentType\": \"Temp\",\n  \"locale\": \"{{locale_us}}\",\n  \"urlCountryCode\": \"{{CountryInitials}}\",\n  \"urlSfLobCode\": \"{{OT_LOB__c}}\",\n  \"resume\": \"Q2FuZGlkYXRlCk1vYmlsZUFQSS1BVAoxMjM0IE1haW4gU3QsIFNhbiBSYW1vbiwgQ2FsaWZvcm5pYSwgOTAwNTAgfCA1MDMtNDU2LTc4OTAgfCB0aW5hQGF0cml1bS5haQpQcm9mZXNzaW9uYWwgU3VtbWFyeQpFbmVyZ2V0aWMgc29mdHdhcmUgZW5naW5lZXIgd2l0aCA3KyB5ZWFycyBleHBlcmllbmNlIGRldmVsb3Bpbmcgcm9idXN0IGNvZGUgZm9yIGhpZ2gtdm9sdW1lIGJ1c2luZXNzZXMuIEluY3JlYXNlZCBjb2RlLWVmZmljaWVuY3kgb2YgWFlaIENvcnAgY3VzdG9tZXIgcG9ydGFsIGJ5IDU1JS4gQm9vc3RlZCBjdXN0b21lciByZXRlbnRpb24gYnkgMjUlLiBTcGVhcmhlYWRlZCBhIHRlYW0gdGhhdCB3b24gdGhlIDIwMTYgQk9TU0lFIEF3YXJkIGZvciBjbG91ZCBjb21wdXRpbmcuIEFuIGVudGh1c2lhc3RpYyB0ZWFtIHBsYXllciBhbmQgZGVlcCBjcmVhdGl2ZSB0aGlua2VyLgpFZHVjYXRpb24KMjAxMi0yMDE1IEJBLCBTb2Z0d2FyZSBFbmdpbmVlcmluZwpVbml2ZXJzaXR5IG9mIFdhc2hpbmd0b24gQm90aGVsbApQdXJzdWVkIG15IHBhc3Npb24gZm9yIEphdmEgc2VydmVyIHByb2dyYW1taW5nIHRocm91Z2ggc2l4IGFkdmFuY2VkIGNsYXNzZXMuClZQIG9mIEp1Z2dlci1JcywgdGhlIGNhbXB1cyBtYWNoaW5lIGxlYXJuaW5nIGNsdWIsIDIwMTQtMjAxNS4KRGVsaXZlcmVkIGFuIGFjdGlvbmFibGUgd2ViaW5hciBvbiBiZXN0IHByYWN0aWNlcyBmb3Igc2VjdXJpdHkgaW4gY2xvdWQgc2VydmVycyB0aGF0IHdhcyBsaW5rZWQgdG8gYnkgdGhlIHBvcHVsYXIgIkRyLiBEb2JicyBKb3VybmFsLiIKTXkgYXJ0aWNsZSwgIkhvdyBDbG91ZCBDb21wdXRpbmcgV2lsbCBDaGFuZ2UgWW91ciBMaWZlIiB3YXMgcHVibGlzaGVkIGluIHRoZSBjYW1wdXMgbWFnYXppbmUuCjIwMTUtMjAxNyAKVW5pdmVyc2l0eSBvZiBXYXNoaW5ndG9uIFN0YXRlCkRpZCBzb21lIElUIHN0dWZmLgpFeHBlcmllbmNlClNlbmlvciBTb2Z0d2FyZSBFbmdpbmVlcgpDbG91ZFdhbGxvcCBJbmMuCkp1bHkgMjAxNSAtIEp1bHkgMjAxNwpSZXNwb25zaWJsZSBmb3Igc3BlYXJoZWFkaW5nIHRlYW1zIHRoYXQgaGFuZGxlZCB0aGUgc29mdHdhcmUgZGV2ZWxvcG1lbnQgbGlmZSBjeWNsZSBmb3IgMTAgY2xpZW50IHByb2plY3RzLCBlbmQgdG8gZW5kLgpCdWlsdCBpbmZyYXN0cnVjdHVyZSB0byBoYW5kbGUgbWlsbGlvbnMgb2YgY2xpZW50IGZpbGVzIGluIHByb3ByaWV0YXJ5IHN5c3RlbXMuCkxlZCB0aGUgZHJpdmUgdG8gaW1wbGVtZW50IHRoZSBQcmluY2lwbGUgb2YgTGVhc3QgUHJpdmlsZWdlIGFjcm9zcyAxMDAlIG9mIHNvZnR3YXJlIGRldmVsb3BtZW50IHN0YWZmLgpSZWR1Y2VkIHNlY3VyaXR5IGJyZWFjaGVzIGJ5IDczJSBmb3IgYWxsIGN1c3RvbWVycyBjb21wYW55d2lkZS4KQnVpbHQgc2VjdXJpdHkgaW50byBuZXcgcHJvZHVjdCBmZWF0dXJlcyB0byBhY2hpZXZlIDEwMCUgY29tcGxpYW5jZSB3aXRoIGluZHVzdHJ5IGJlc3QgcHJhY3RpY2VzLgpGcmVlbGFuY2UgU29mdHdhcmUgRW5naW5lZXIKSnVuZSAyMDE2IC0gcHJlc2VudApDb21wb3NlZCBhbiBhcHAgdG8gYWxsb3cgdm9pY2UgY29udHJvbCBvZiBsaWdodHMsIGdhcmFnZSBkb29yLCBhbmQgaG9tZSB0aGVybW9zdGF0LCB1c2luZyBhbiBBbWF6b24gRWNobyBhbmQgUmFzcGJlcnJ5IFBpLgpCdWlsdCBhIHJlYWwgdGltZSBzdG9jayBwaWNraW5nIGFwcCB0aGF0IGNvbXBhcmVzIGN1cnJlbnQgcHJpY2UgdG8gVW5pZm9ybSBBZGp1c3RlZCBGaW5hbmNpYWwgUmVwb3J0aW5nIFN0YW5kYXJkcyBkYXRhIHRvIGlkZW50aWZ5IGJ1eS1ub3cgb3Bwb3J0dW5pdGllcy4KQnVpbHQgbmV3IHNlYXJjaCBmdW5jdGlvbmFsaXR5IGludG8gdGhlIG5leHQgZ2VuZXJhdGlvbiBTdHJhdG9EQiBzY2FsYWJsZSBkYXRhYmFzZSBtYW5hZ2VtZW50IHN5c3RlbS4KUHJlc2lkZW50LCBYWVogVW5pdmVyc2l0eSBZb3VuZyBXb21lbiBpbiBUZWNoLiBGYWNpbGl0YXRlZCBtb250aGx5IG1lZXRpbmdzIHRvIGVuaGFuY2UgYSBkaXZlcnNlIGNvbW11bml0eSBpbiBzb2Z0d2FyZSBlbmdpbmVlcmluZy4gTWFuYWdlZCBhY3Rpdml0aWVzIGxpa2UgbW9udGhseSB0ZWNoIHRhbGtzLCB3b3Jrc2hvcHMsIGFuZCBzdHVkZW50IHBhbmVscy4KU2tpbGxzCkNyZWF0aXZpdHksIFdlYiBEZXZlbG9wbWVudCwgSmF2YSwgTGVhZGVyc2hpcCwgRGF0YSBTdHJ1Y3R1cmVzLCBTUUwsIENvbW11bmljYXRpb24sIE9wZW4gU291cmNlIEV4cGVyaWVuY2UsIEMjLCBDcml0aWNhbCBUaGlua2luZywgQ29kaW5nLCBKYXZhIFNjcmlwdCwgQ2FsbSBEZW1lYW5vciwgU2VjdXJpdHksIEMrKywgQ29sbGFib3JhdGlvbiwgTWFjaGluZSBMZWFybmluZywgUHl0aG9uLCBJbnF1aXNpdGl2ZW5lc3MsIERlYnVnZ2luZywgaU9TLCBFbnRodXNpYXNtLCBQcm9ibGVtIFNvbHZpbmcsIFBIUCwgUG9zaXRpdmUgQXR0aXR1ZGUsIFJ1YnkvUmFpbHMsIC5OZXQgRGV2ZWxvcGVy\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/JobApply",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"JobApply"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Job Applied",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"console.log(obj);\r",
+							"//making sure we got 200 OK\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"// Job applies record not created in salesforce right away. \r",
+							"pm.test('Check Job Apply is in salesforce', function () {\r",
+							"    pm.expect(obj.records[0].ARF_Personal_Email__c).to.eql(\r",
+							"        pm.environment.get('email').toLowerCase()\r",
+							"    );\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v48.0/query/?q=Select+id,ARF_Personal_Email__c+FROM+job_applies__c+WHERE ARF_Personal_Email__c+=+'{{email}}'",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v48.0",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "Select+id,ARF_Personal_Email__c+FROM+job_applies__c+WHERE ARF_Personal_Email__c+=+'{{email}}'",
+							"description": "A SOQL query. Note that you will need to replace spaces with “+” characters in your query string to create a valid URI. An example query parameter string might look like: “SELECT+Name+FROM+MyObject”. If the SOQL query string is invalid, a MALFORMED_QUERY response is returned."
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post Recommendations Zengine",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"locale\":\"{{locale_us}}\",\n\t\"location\":\"{{postal_code}}\",\n\t\"experience\": \"[{\\\"attributes\\\":{\\\"type\\\":\\\"Candidate_Employment_History__c\\\"},\\\"Employer__c\\\":\\\"DTCC\\\",\\\"Current_Indicator__c\\\":true,\\\"Job_Title__c\\\":\\\"Senior .Net Developer\\\",\\\"Country__c\\\":\\\"US\\\",\\\"State_Province__c\\\":\\\"NJ\\\",\\\"City__c\\\":\\\"Jersey City\\\",\\\"Employment_Description__c\\\":\\\"Description:\\\\nEducational Loan Financial Management System is a web based comprehensive software package supporting Student Financial Aid Administration, Loans and Reports. The system is modular and organized to support all of the functions of the Financial Aid Office like need analysis, evaluation, packaging, notification, disbursement, funds management, tracking, verification and reporting. This application completely web enabled the process of loan applying to loan repayment of a customer.\\\\nResponsibilities:\\\\n•\\\\tInvolved in full life cycle of software development like Requirement Analysis, Design, Implementation and Testing.\\\\n•\\\\tImplemented Model View View Model (MVVM) pattern in WPF/Silverlight windows presentation Foundation application using C#.Net.\\\\n•\\\\tInvolved in developing windows application using WinForms and WPF.\\\\n•\\\\tCreated Restful services using ASP.NET Web API for exposing these to end users.\\\\n•\\\\tEnhanced user experience by designing new web features using MVC Framework like Backbone.js.\\\\n•\\\\tWorked with Web API to provide services to HTTP requests.\\\\n•\\\\tInvolved in writing AngularJS and JavaScript in client side validations.\\\\n•\\\\tCreated customized UI web forms using HTML and JavaScript, AngularJS, ExtJS, date picker using Bootstrap and Developed Data Transfer Objects (DTO) in C# for business entities.\\\\n•\\\\tUsed Telerik controls like RadGrid, Rad Auto Complete Box, Data Forms, Bread Crumb, raddocking, etc. for an overall look and feel consistency and did prototyping on these controls.\\\\n•\\\\tResponsible for developing WCF Service for exchange of data between systems and implement business logic and used Restful API.\\\\n•\\\\tFollowed Agile Methodologies (SCRUM) and Test Driven Development (TDD).\\\\n•\\\\tUsed Entity Framework technology for querying, data retrieval, manipulation and data storage using LINQ and used ADO.net for connecting to the database.\\\\n•\\\\tImplemented Bootstrap to make our webpages more responsive.\\\\n•\\\\tInvolved in documentation like System Design and Architecture Document (SDAD), Interface Design Document (IDD) and Software Design Document (SDD) to a Thick Client application.\\\\n•\\\\tUsed SSRS for generation of the various types of reports.\\\\n•\\\\tDeveloped Data Access Layer (DAL) using LINQ, invoked Database tables and stored procedures and Involved in Development of Data Access, Business and application layer using C#.Net and ASP. NET.\\\\n•\\\\tUsed TFS to connect with other developers in the team to maintain code efficiency.\\\\n•\\\\tUsed TFS for version controlling. Used GIT for code check in and check out from TFS.\\\\n•\\\\tInterpret design and coordinate with Architects and Engineers throughout all phases of the design and project specifications.\\\\n•\\\\tUtilization of customizing SharePoint lists using InfoPath services, and form libraries for status reports\\\\n•\\\\tDesigned interactive promotional pages for marketing using HTML, Javascript, and jQuery fully integrated into the Sitecore CMS environment.\\\\n•\\\\tUsed NLog to trace the logging information. Created NLog unit tests.\\\\n•\\\\tUsed Multithreading techniques for creating high performance applications, Implemented LDAP authentication for user's login.\\\\n•\\\\tExperience to communicate with End client to understand the business requirement and prepare business document.\\\\n•\\\\tDevelopment experience with Object Oriented Programming concepts.\\\\n•\\\\tHands on experience on writing Queries, Stored procedures, Functions and Triggers by using Oracle 10g/11g/12c.\\\\n•\\\\tWorking in Agile/Scrum Methodologies for rapid development and regular adaption to the varying requirements and continuous delivery of the working software\\\\n•\\\\tUsed Code Collaborator software for all the documentation reviews\\\\n•\\\\tActively participated in unit testing of the application to ensure quality\\\\n•\\\\tMaintained version control using IBM Rational Clear Case.\\\\n•\\\\tExperienced in Onsite Offshore model coordinating with development/support activities.\\\\n\\\\nEnvironment: .NET Framework 1.1/2.0/3.5/4.0/4.5, Nlog, HTML, XML/XSL, SQL Server 2012, SharePoint 2010, Oracle 11g/12c, TFS, Git, C#.net, jQuery, AngularJS 1.x, Bootstrap 3, Design Driven Documentation, ADO.NET, Visual Studio 2012/2010/2008, WCF, WPF, MVVM, WEB API, Code Collaborator, IIS 7, LINQ, WPF/Silverlight, WinForms, SSRS, Clear Case, Agile/Scrum Software Methodology\\\",\\\"Start_Date__c\\\":\\\"2015-08-01\\\",\\\"Parse_Indicator__c\\\":true},{\\\"attributes\\\":{\\\"type\\\":\\\"Candidate_Employment_History__c\\\"},\\\"Employer__c\\\":\\\"Hospira\\\",\\\"Job_Title__c\\\":\\\"Senior .Net Developer\\\",\\\"Country__c\\\":\\\"US\\\",\\\"State_Province__c\\\":\\\"IL\\\",\\\"City__c\\\":\\\"Chicago\\\",\\\"Employment_Description__c\\\":\\\"Patient Care Record Suite is a comprehensive electronic medical record that supports clinicians in providing health care in the home setting and includes modules such as patient information, plan of care, and coordination of care, managed care and visit doc We tried to develop a health care application which is helpful for the better experience of patients.\\\\n\\\\nResponsibilities:\\\\n•\\\\tTranslate requirements to design, architect and document systems, and write code that is stable, reusable, scalable and simple.\\\\n•\\\\tVBA application development. UI design, revision and enhancement. Data validation.\\\\n•\\\\tDeveloping an application using ASP.NET MVC Razor forms (front end) and SQL Server 2012 stored procedures (backend).\\\\n•\\\\tWorking with an Agile, Scrum methodology to ensure delivery of high quality work with every monthly iteration.\\\\n•\\\\tUsing SSIS tools like Import and Export Wizard, Package Installation, and SSIS Package Designer.\\\\n•\\\\tFollowed Agile Methodologies (SCRUM) and Test Driven Development (TDD).\\\\n•\\\\tDeveloped the application with ASP.NET Model-View-Controller (MVC) architecture with MVC 5\\\\n•\\\\tCreating advanced Excel and Word reporting tools (100+ complex reports) for existing SQL Server 2012 databases using ASP.NET Interop front end programming.\\\\n•\\\\tWorked on the style of web application using CSS3.\\\\n•\\\\tExperience in designing Test Plans, Test Scenarios, Test cases and Test summary reports.\\\\n•\\\\tExperience in working with Test Driven development (TDD/BDD) by using gherkins language in cucumber tool.\\\\n•\\\\tHighly Involved in Creating Sitecore Template for the pages/items to meet the business requirements\\\\n•\\\\tThe Project is to utilize SharePoint 2010 and other Microsoft latest technologies like Silver Light, Business Connectivity Services (BCS), and Integration of various technologies to the site.\\\\n•\\\\tExtensively used Jq grid and J Query functions in Model View Controller Pattern.\\\\n•\\\\tResponsible for setting up AngularJS framework to achieve data binding between HTML5 and JavaScript objects with JQuery.\\\\n•\\\\tExperienced in developing Rich Internet Application (RIA) using Microsoft Silverlight technology & AJAX.\\\\n•\\\\tInstalled and configured Message Broker Toolkit for enabling design, development, build and deploy Message Flows & Message Sets supporting message broker applications.\\\\n•\\\\tHands on in application development using with C#, Views in ASP.NET MVC using C# as the code-behind language and ADO.NET and LINQ as the Database data consumer\\\\n•\\\\tUser Interface was developed using ASP.NET MVC Views that runs on IIS 7.0 using Visual Studio.\\\\n•\\\\tUsed WPF of .NET 4.5 for creating control templates and more appealing visual appearance\\\\n•\\\\tResponse UI and website layout is achieved using Bootstrap, AngularJS, Node js helped in bootstrapping web application efficiently without registering call backs which helped in code debugging.\\\\n•\\\\tDesign, develop, test, debug, and implement Silverlight 5.0 based applications following the MVVM framework template.\\\\n•\\\\tDemonstrated experience with REST full services, WCF and other Web Services technologies (WSDL, SOAP, JSON, XML, XSL, and serialization.\\\\n•\\\\tAzure Storage development and design utilizing Blobs, Pages, Queues, Tables and VM's.\\\\n•\\\\tConverted .Net application to Microsoft Azure Cloud Service Project as part of cloud deployment.\\\\n•\\\\tWorked with Team Foundation Server (TFS) for version control during development.\\\\n•\\\\tManaged Logging information using Nlog. Stored log messages and exceptions using Nlog.\\\\n•\\\\tUsed ADO.NET objects such as Data Adapter, Data Reader, Dataset and Data List for reading/updating records in the database.\\\\n•\\\\tResponsible in developing Stored Procedures, Views, Indexes, Scripts for database transaction SQL server 2012.\\\\n•\\\\tInvolved in analyzing various graphs for the client side and server side metrics like Transaction Response Time, Hits per second graph, Pages download per second, Throughput, Memory & CPU utilization and trace logs.\\\\n\\\\nEnvironment: Visual Studio 2015, .Net Framework 4.5/5.0, Excel, Access, VBA, Asp.Net MVC, SharePoint 2010, TFS, Git, C#, SignalR, TDD, Sitefinity, XML/XSL, WPF, HTML5, Silverlight 5.0, CSS3, ADO.NET, RIA, AJAX, Bootstrap 3, FileNet, AWS, Web API 2.0, AngularJS 1.x, Node.Js, SOA, SQL Server 2012/2005, WCF Services, MVC 4.\\\",\\\"Start_Date__c\\\":\\\"2014-10-01\\\",\\\"End_Date__c\\\":\\\"2015-08-31\\\",\\\"Current_Indicator__c\\\":false,\\\"Parse_Indicator__c\\\":true},{\\\"attributes\\\":{\\\"type\\\":\\\"Candidate_Employment_History__c\\\"},\\\"Employer__c\\\":\\\"Noridian Mutual\\\",\\\"Job_Title__c\\\":\\\"Net Developer\\\",\\\"Country__c\\\":\\\"US\\\",\\\"State_Province__c\\\":\\\"ND\\\",\\\"City__c\\\":\\\"Fargo\\\",\\\"Employment_Description__c\\\":\\\"Epharma\\\\nThis project deals with Enterprise Resource Planning for Smilax Laboratories. The modules in this project are Sales-Distribution, Material-Management, Purchase-Production, Human Resource Department, Finance- Quality Control.\\\\n\\\\nResponsibilities:\\\\n•\\\\tDevelopment of new features, catering to change requests and carrying out bug fixes in the application.\\\\n•\\\\tHave interacted with users and customers to understand their requirements. Had meetings with users to discuss the requirements of the user and business process.\\\\n•\\\\tAnalyzed and designed new WPF application using MVVM and Repository pattern, from design to completion.\\\\n•\\\\tDesigned and developed jobs using Data Stage/Quality stage for loading the data into Dimension and Fact Tables.\\\\n•\\\\tDeveloped & maintained WebForms with ASP.Net, Silverlight 4.0 and C#.Net.\\\\n•\\\\tHaving sound knowledge in developing RIA Application using Silverlight4.0 and integration with Asp.net.\\\\n•\\\\tInvolved in Programming XAML applications.\\\\n•\\\\tCoding the presentation layer using WPF and service layer using Windows Communication foundation technology.\\\\n•\\\\tCreation of new tables and views, attaching keys and indexing for Sql server Database.\\\\n•\\\\tCreated a project and Installed SQL Server Data Tools (SSDT). Provided by SSDT, developed and designed environment for Building SSIS, SSAS and SSRS.\\\\n•\\\\t◦ Interacted with the development team to validate the scope of fixing the bugs.\\\\n•\\\\tExtensively worked on Oracle backend Programming using PL/SQL, Stored Procedures, Functions.\\\\n•\\\\tCreated oracle database objects like table, sequences, collections, packages, View, Materialized Views, collections, Triggers, Pl/SQL object types.\\\\n•\\\\tInvolved in Installation, configuration, upgradation, development, remote technical support, troubleshooting and system administration of WebSphere MQ and WebSphere Message Broker.\\\\n•\\\\tUsed Data mining algorithms, mining model viewers, and Data mining tools that are included in SQL Server Analysis Services (SSAS) and Developed reports using SQL Server Reporting Services (SSRS).\\\\n•\\\\tImplemented Multi-Tier applications including Web and Windows services, SSIS, Console Applications, and Scheduled Tasks for integration in the middle.\\\\n•\\\\tUsed Data mining algorithms, mining model viewers, and Data mining tools that are included in SQL Server Analysis Services (SSAS), SignalR and Developed reports using SQL Server Reporting Services (SSRS).\\\\n•\\\\tWrote Stored Procedures to incorporate new Business logic.\\\\n•\\\\tUsed PL/SQL programs in writing Sql Server Stored Procedures and also written database triggers for various operations. Implemented Object Oriented Programming (OOPS) and understanding of software engineering practices in.NET for windows services development.\\\\n•\\\\tTesting of database, queries optimization and performance.\\\\n•\\\\tManaging templates and style sheets (CSS) using XAML.\\\\n•\\\\tDeveloping XML Schema, Extracting XML from Oracle DB, Parsing and creation of xml document in db to store Order and Customer related information.\\\\n•\\\\tExperience in using Source Code Control Systems like MS Visual Source Safe and Team Foundation Server (TFS) and Proficient in writing Unit Test Cases for Business logic.\\\\n•\\\\tIncorporated Information security throughout the software development life cycle.\\\\n•\\\\tUsed .NET 4.5 in creating a WCF Web-Authenticator.\\\\n•\\\\tGood knowledge in front end development using Oracle Forms6i/Reports6i/10g.\\\\n•\\\\tUsed WPF of .NET 4.5 for creating control templates and more appealing visual appearance.\\\\n\\\\nEnvironment: WPF, SILVERLIGHT, C#, SQL Server 2012 R2, Web Services, MVVM, Azure, Oracle, TFS, Git, SSIS, SSRS, SSAS, SSDT, Agile Development, Entity Framework, WebForms, AJAX Control Toolkit, SignalR, Enterprise Library 4.1, HTML, RIA, Silverlight4.0, IIS 7.0, Visual Studio 2012, OOPS, Object Oriented Methodology, CSS, XAML, XHMTL, Windows 8.1, XML, Web Services, WCF, WWF, .Net Framework 4.0/4.5, Microsoft Reporting Services (SSRS)\\\",\\\"Start_Date__c\\\":\\\"2012-04-01\\\",\\\"End_Date__c\\\":\\\"2014-08-31\\\",\\\"Current_Indicator__c\\\":false,\\\"Parse_Indicator__c\\\":true},{\\\"attributes\\\":{\\\"type\\\":\\\"Candidate_Employment_History__c\\\"},\\\"Employer__c\\\":\\\"Capgemini\\\",\\\"Job_Title__c\\\":\\\"NET Developer\\\",\\\"Employment_Description__c\\\":\\\"Responsibilities:\\\\nInvolved in developing various modules for the Epharma System using Microsoft .NET technologies.\\\\n•\\\\tDeveloped rich user interface to support different client browsers using ASP.NET 1.1 Web Forms, User Controls, Web Controls and HTML Controls.\\\\n•\\\\tDeveloped secure ASP.NET pages, which includes login pages, which will authorize and authenticate the users by retrieving their login names and passwords from the Database using ADO .NET.\\\\n•\\\\tDeveloped java script controls to customize the user interactions with web forms. Designed the physical data model in SQL Server 2000.\\\\n•\\\\tUsed Data Grid control to display, edit, delete and inserting master records.\\\\n•\\\\tDeveloped the search functionality to search the customer.\\\\n•\\\\tUsed to optimize web applications for mobile devices\\\\n•\\\\tDeveloped Crystal Reports per the customer requirement.\\\\n•\\\\tResponsible for Unit Testing for the modules developed.\\\\n\\\\nEnvironment: ASP.NET, VB.NET, HTML, Java Script, Microsoft SQL server 2000\\\",\\\"Start_Date__c\\\":\\\"2008-07-01\\\",\\\"End_Date__c\\\":\\\"2012-03-31\\\",\\\"Current_Indicator__c\\\":false,\\\"Parse_Indicator__c\\\":true}]\",\n    \"education\": \"[{\\\"attributes\\\":{\\\"type\\\":\\\"People_Education__c\\\"},\\\"Education_Type__c\\\":\\\"Education\\\",\\\"Education_Name__c\\\":\\\"a1xd0000000FEasAAG\\\",\\\"Establishment__c\\\":\\\"University of Colorado Denver\\\",\\\"Degree_Type_Picklist__c\\\":\\\"masters\\\",\\\"Education_Date__c\\\":\\\"2016-01-01\\\",\\\"StudyArea__c\\\":\\\"Computer Science\\\"},{\\\"attributes\\\":{\\\"type\\\":\\\"People_Education__c\\\"},\\\"Education_Type__c\\\":\\\"Education\\\",\\\"Education_Name__c\\\":\\\"a1xd0000000FEasAAG\\\",\\\"Establishment__c\\\":\\\"Stanford University\\\",\\\"Degree_Type_Picklist__c\\\":\\\"bachelors\\\",\\\"Education_Date__c\\\":\\\"2010-01-01\\\",\\\"StudyArea__c\\\":\\\"Computer Information\\\"}]\"\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/jobs/recommendations/zengine",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"jobs",
+						"recommendations",
+						"zengine"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FetchLinkedInConfiguration",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"    pm.expect(obj.message).to.eql('Successful');\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/linkedin/config",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"linkedin",
+						"config"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetLinkedInAuthUrl",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());",
+							"const obj = JSON.parse(jsonData);",
+							"pm.test(\"Status code is 200\", function () {",
+							"  pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"The response has all properties\", () => {",
+							"    pm.expect(obj.message).to.eql('Successful');",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/linkedin",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"linkedin"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,1349 @@
+{
+	"info": {
+		"_postman_id": "84154ab1-e238-4815-bd51-5e91e8ae9b55",
+		"name": "TCAST-Invite-CA_Temp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "authConfigDetails",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"var data = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"client_id\", data.environmentDetails.salesforce.clientID);\r",
+							"pm.environment.set(\"mobile_search_url\", data.environmentDetails.mobileSearch.baseURL);\r",
+							"pm.environment.set(\"mobile_search_api_key\", data.environmentDetails.mobileSearch.apiKey);\r",
+							"\r",
+							"pm.environment.set(\"environment_api_key\", data.environmentDetails.tcast.apiKey);\r",
+							"\r",
+							"pm.environment.set(\"callbackURI\", data.environmentDetails.salesforce.callbackURI);\r",
+							"\r",
+							"pm.environment.set(\"identifier\", data.environmentDetails.identifier);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var firstName = '';\r",
+							"var lastName = '';\r",
+							"\r",
+							"var contactFirstName = '';\r",
+							"var contactLastName = '';\r",
+							"\r",
+							"//Last Name: QA+Test + Testers Initials + NN (Sequential number)\r",
+							"var sequenceNumber = Number(pm.environment.get('LastNameCounter'));\r",
+							"\r",
+							"pm.environment.set('email',generateRandomEmail('QATestCan',sequenceNumber));\r",
+							"pm.environment.set('contactEmail',generateRandomEmail('QATestCon',sequenceNumber));\r",
+							"pm.environment.set('contactBusEmail',generateRandomEmail('QATestCon',sequenceNumber));\r",
+							"\r",
+							"//First Name:QA + [2 letter country ISO  abbreviation]        \r",
+							"//create first name candidate\r",
+							"\r",
+							"pm.environment.set('firstName','QACan' + pm.environment.get('CACountryInitials'));\r",
+							"\r",
+							"//create first name contact\r",
+							"pm.environment.set('conFirstName','QACon' + pm.environment.get('CACountryInitials'));\r",
+							"\r",
+							"//candidate last name\r",
+							"pm.environment.set('lastName','QACanTest' + pm.environment.get('TesterInitials') + sequenceNumber);\r",
+							"//contact last name\r",
+							"pm.environment.set('conLastName','QAConTest' + pm.environment.get('TesterInitials') + sequenceNumber);\r",
+							"\r",
+							"pm.environment.set('LastNameCounter',sequenceNumber + 1);  \r",
+							"\r",
+							"//format phone to desired \r",
+							"pm.environment.set('phone',formatPhoneNumber(pm.variables.replaceIn(\"{{$randomPhoneNumber}}\")));\r",
+							"\r",
+							"//create new phone for Contact\r",
+							"pm.environment.set('conPhone',formatPhoneNumber(pm.variables.replaceIn(\"{{$randomPhoneNumber}}\")));\r",
+							"\r",
+							"//main address\r",
+							"pm.environment.set('contactCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('contactStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('contactStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							"\r",
+							"//set source\r",
+							"pm.environment.set('sourceId','RH App');\r",
+							"\r",
+							"//now generate verification code\r",
+							"var rString = generateVerificationCode();\r",
+							"// console.log(rString);\r",
+							"//set source\r",
+							"pm.environment.set('randomVerificationCode',rString);\r",
+							"\r",
+							"pm.environment.set('todayDateFormat',generateDate());\r",
+							"pm.environment.set('futureExpiryDate',generateDate(15));\r",
+							"\r",
+							"pm.environment.set('todayDate',generateDate(null,true));\r",
+							"\r",
+							"//format phone number\r",
+							"function formatPhoneNumber(phoneNumberString) {\r",
+							"  var cleaned = ('' + phoneNumberString).replace(/\\D/g, '')\r",
+							"  var match = cleaned.match(/^(\\d{3})(\\d{3})(\\d{4})$/)\r",
+							"  if (match) {\r",
+							"    return '(' + match[1] + ') ' + match[2] + '-' + match[3]\r",
+							"  }\r",
+							"  return null\r",
+							"}\r",
+							"\r",
+							"//generate verification code\r",
+							"function generateVerificationCode() {\r",
+							"    var length = 40;\r",
+							"    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';\r",
+							"    var result = '';\r",
+							"    for (var i = length; i > 0; --i) result += chars[Math.floor(Math.random() * chars.length)];\r",
+							"    return result;\r",
+							"}\r",
+							"\r",
+							"//Generate date\r",
+							"function generateDate(strDays, format){\r",
+							"    const dtDate = new Date();\r",
+							"    if (strDays != undefined){\r",
+							"        dtDate.addDays(strDays);\r",
+							"    }\r",
+							"    if (format == undefined){\r",
+							"        return dtDate.toISOString();\r",
+							"    }\r",
+							"    return dtDate.toISOString().split('T')[0];\r",
+							"}\r",
+							"\r",
+							"function generateRandomEmail(name, ctr){\r",
+							"    var chars = 'abcdefghijklmnopqrstuvwxyz1234567890';\r",
+							"    var string = '';\r",
+							"\r",
+							"    //genernate random email\r",
+							"    for(var ii=0; ii<5; ii++){\r",
+							"        string += chars[Math.floor(Math.random() * chars.length)];\r",
+							"    }\r",
+							"\r",
+							"    var randmonEmail = name + string + ctr +  '@Automation.com';\r",
+							"\r",
+							"    return randmonEmail;\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/authconfig?getdetails=true",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"authconfig"
+					],
+					"query": [
+						{
+							"key": "getdetails",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SOAP Login Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var result = xml2Json(pm.response.text())[\"soapenv:Envelope\"][\"soapenv:Body\"].loginResponse.result;",
+							"var url = result.serverUrl.split(\"/\");",
+							"pm.environment.set(\"admin_accessToken\", result.sessionId);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "text/xml",
+						"type": "text"
+					},
+					{
+						"key": "SOAPAction",
+						"value": "login",
+						"type": "text"
+					},
+					{
+						"key": "charset",
+						"value": "UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n<env:Envelope xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"\n    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n    xmlns:env=\"http://schemas.xmlsoap.org/soap/envelope/\">\n  <env:Body>\n    <n1:login xmlns:n1=\"urn:partner.soap.sforce.com\">\n      <n1:username>{{admin_username}}</n1:username>\n      <n1:password>{{admin_password}}{{admin_securityToken}}</n1:password>\n    </n1:login>\n  </env:Body>\n</env:Envelope>"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/Soap/u/v48.0",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"Soap",
+						"u",
+						"v48.0"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Query Master Data",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var sequenceNumber = Number(pm.environment.get('companyNameCounter'));\r",
+							"if (sequenceNumber == undefined){\r",
+							"    sequenceNumber = 0;\r",
+							"}\r",
+							"\r",
+							"//Account name \r",
+							"//QA + [2 letter country ISO abbreviation] + TEST + Testers Initials + NN(sequential number)\r",
+							"//QAUSTESTCOMPAUTOSP(random number )\r",
+							"pm.environment.set('accountName','QA' + pm.environment.get('CountryInitials') \r",
+							"                    + 'TESTCOMPAUTO' + pm.environment.get('TesterInitials') \r",
+							"                    + sequenceNumber);\r",
+							"\r",
+							"pm.environment.set('companyNameCounter',sequenceNumber + 1);  \r",
+							"\r",
+							"//main address\r",
+							"pm.environment.set('mainCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('mainStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('mainStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							"pm.environment.set('companyPhone',pm.variables.replaceIn(\"{{$randomPhoneNumber}}\"));\r",
+							"\r",
+							"\r",
+							"//Billing address\r",
+							"pm.environment.set('billingCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('billingStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('billingStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"\r",
+							" for(var i=0; i<obj.compositeResponse.length; i++){\r",
+							"    if(obj.compositeResponse[i].referenceId == 'branchName'){\r",
+							"        pm.environment.set('branchId', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'countryName'){\r",
+							"        pm.environment.set('CA_Country_of_Record__c', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'stateName'){\r",
+							"        pm.environment.set('CA_State__c', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'jobfunction'){\r",
+							"        pm.environment.set('jobfunctionId', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'lobName'){\r",
+							"        pm.environment.set('OT_LOB__c', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"allOrNone\" : true,\n    \"compositeRequest\" : [{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+Branch__c+where+Branch_Name__c=%27{{CAbranch}}%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"branchName\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+job_function__c+where+Name=%27Sr. Finance Accountant%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"jobfunction\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+country__c+where+Name=%27{{CAcountry}}%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"countryName\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+state__c+where+Name=%27{{CAstate}}%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"stateName\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+Line_of_Business__c+where+Name=%27{{lob}}%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"lobName\"\n    }]\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/composite",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"composite"
+					]
+				},
+				"description": "Executes actions on multiple records in one request. Use SObject Collections to reduce the number of round-trips between the client and server. This resource is available in API version 42.0 and later.\n\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Account",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var sequenceNumber = Number(pm.environment.get('companyNameCounter'));\r",
+							"if (sequenceNumber == undefined){\r",
+							"    sequenceNumber = 0;\r",
+							"}\r",
+							"\r",
+							"//Account name \r",
+							"//QA + [2 letter country ISO abbreviation] + TEST + Testers Initials + NN(sequential number)\r",
+							"//QAUSTESTCOMPAUTOSP(random number )\r",
+							"pm.environment.set('accountName','QA' + pm.environment.get('CountryInitials') \r",
+							"                    + 'TESTCOMPAUTO' + pm.environment.get('TesterInitials') \r",
+							"                    + sequenceNumber);\r",
+							"\r",
+							"pm.environment.set('companyNameCounter',sequenceNumber + 1);  \r",
+							"\r",
+							"//main address\r",
+							"pm.environment.set('mainCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('mainStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('mainStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							"pm.environment.set('companyPhone',pm.variables.replaceIn(\"{{$randomPhoneNumber}}\"));\r",
+							"\r",
+							"\r",
+							"//Billing address\r",
+							"pm.environment.set('billingCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('billingStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('billingStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"var accountId = obj.compositeResponse[2].body.Id;\r",
+							"var branchId = obj.compositeResponse[0].body.Id;\r",
+							"\r",
+							"for(var i=0; i<obj.compositeResponse.length; i++){\r",
+							"    if(obj.compositeResponse[i].referenceId == 'AccountInfo'){\r",
+							"        pm.environment.set('accountId', obj.compositeResponse[i].body.Id);\r",
+							"    }\r",
+							"    if(obj.compositeResponse[i].referenceId == 'skillId'){\r",
+							"        pm.environment.set('skillId', obj.compositeResponse[i].body.records[0].Id);\r",
+							"    }\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"allOrNone\" : true,\n    \"compositeRequest\" : [{\n        \"method\" : \"POST\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Account\",\n        \"referenceId\" : \"Account\",\n        \"body\" : {  \n            \"Aliases__c\" : \"{{accountName}}=end=\",\n            \"Branch__c\" : \"{{branchId}}\",\n            \"Company_Cluster__c\" : \"E\",\n            \"Company_Status__c\" : \"Customer\",\n            \"Company_Type__c\" : \"Small/Medium Business/Enterprise\",\n            \"Country_of_Record_Name__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Country_of_Record__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Credit_Limit__c\" : 84000.0,\n            \"Credit_Status_Name__c\" : \"1 - Credit OK\",\n            \"Data_Set_ID__c\" : \"US\",\n            \"DT_Rate__c\" : 2.0,\n            \"Follow_up_Call_Desired__c\" : true,\n            \"LOBs__c\" : \"AT, RHMR\",\n            \"Location__c\" : \"{{branchId}}\",\n            \"Name\" :\t\"{{accountName}}\",\n            \"OT_Rate_1__c\" : 1.5,\n            \"Over_Credit_Limit__c\" : false,\n            \"Perm_Follow_up_Call_Recurrence__c\" : \"Monthly\",\n            \"Phone\" : \"{{companyPhone}}\",\n            \"Primary_Phone_Number__c\" : \"B +1 {{companyPhone}}\",\n            \"Temp_Day_Of_the_Week_For_Follow_Up_Calls__c\" : \"Monday\",\n            \"Temp_Follow_up_Call_Recurrence__c\" : \"Weekly\",\n            \"Temp_Follow_up_of_Days_After_1st_Day__c\" : 2.0,\n            \"Times_Contacted_All_Time__c\" : 121.0,\n            \"UFS_Service_By_Location__c\" : \"00090\",\n            \"Wage_Determination__c\" : false\n        }\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"AccountInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Account/@{Account.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"CompanyAddress\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_Address__c\",\n        \"body\" : {  \n            \"AddressType__c\" : \"Main\",\n            \"Name\":\t\"{{mainStreetName}} {{mainStreetAddress}} {{mainCity}}  94920, United States\",\n            \"Address_Line_1__c\" : \"{{mainStreetName}}\",\n            \"Address_Line_2__c\" : \"{{mainStreetAddress}}\",\n            \"CountryLookup__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Address_Line_3__c\" :\"\",\t\t\n            \"City__c\":\t\"{{mainCity}}\",\n            \"Company__c\" : \"@{AccountInfo.Id}\",\n            \"Inactive__c\" : \"false\",\n            \"Postcode__c\" : \"{{CAPostalCode}}\",\n            \"Primary__c\" : \"true\",\n            \"StateLookup__c\" : \"{{CA_State__c}}\"\n        }\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"CompanyAddressBilling\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_Address__c\",\n        \"body\" : {  \n            \"AddressType__c\" : \"Billing\",\n            \"Name\":\t\"{{billingStreetName}} {{billingStreetAddress}} {{billingCity}}  {{CAPostalCode}}, {{CAcountry}}\",\n            \"Address_Line_1__c\" : \"{{billingStreetName}}\",\n            \"Address_Line_2__c\" : \"{{billingStreetAddress}}\",\n            \"CountryLookup__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Address_Line_3__c\" :\"\",\t\t\n            \"City__c\":\t\"{{billingCity}}\",\n            \"Company__c\" : \"@{AccountInfo.Id}\",\n            \"Inactive__c\" : \"false\",\n            \"Postcode__c\" : \"{{CAPostalCode}}\",\n            \"Primary__c\" : \"true\",\n             \"StateLookup__c\" : \"{{CA_State__c}}\"\n        }\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"CompanyAddressInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_Address__c/@{CompanyAddress.id}\"\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"CompanyAddressBillingInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_Address__c/@{CompanyAddressBilling.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"CompJobFunction\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_Job_Function__c\",\n        \"body\" : {  \n            \"Account__c\" : \"@{AccountInfo.Id}\",\n            \"Job_Function__c\" : \"{{jobfunctionId}}\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"CompJobFunctionInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_Job_Function__c/@{CompJobFunction.id}\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+skill__c+where+name=%27Audit%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"skillId\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"CompanySkill\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_Skills__c\",\n        \"body\" : {  \n            \"Expertise__c\" : \"Not Rated\",\n            \"Account__c\" : \"@{AccountInfo.Id}\",\n            \"Skill__c\" : \"@{skillId.records[0].Id}\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"CompanySkillInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_Skills__c/@{CompanySkill.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"BO\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Billing_Option__c\",\n        \"body\" : {  \n            \"Alternate_Work_Week__c\" : \"Sat-Fri\",\n            \"Billing_Method__c\" : \"Regular\",\n            \"Bill_by_Identifier__c\" : \"One Temp/Inv by W/E Date\",\n            \"Bill_Cycle__c\" : \"Daily\",\n            \"Company__c\" : \"@{AccountInfo.Id}\",\n            \"Data_Set_ID__c\" : \"US\",\n            \"Distribution_Method__c\" : \"Standard Mail\",\n            \"Invoice_Format__c\" : \"Standard\",\n            \"Job_Type__c\" : \"Temp\",\n            \"LOB__c\" : \"{{OT_LOB__c}}\",\n            \"Output_Method__c\" : \"PDF\"\n\t\t}\n    },{\n        \"method\" : \"PATCH\",\n        \"referenceId\" : \"patchAccount\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Account/@{AccountInfo.Id}\",\n        \"body\" : {\n            \"Main_Address__c\":\"@{CompanyAddressInfo.Id}\",\n            \"Primary_Worksite_Address__c\":\"@{CompanyAddressInfo.Id}\",\n            \"Primary_Billing_Address__c\":\"@{CompanyAddressBillingInfo.Id}\"\n\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"NewAccountOwner\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/User/@{AccountInfo.OwnerId}?fields=Name,EmployeeNumber\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"CompPOC\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Company_POC__c\",\n        \"body\" : {  \n            \"Company__c\" : \"@{AccountInfo.Id}\",\n            \"LOB__c\" : \"{{OT_LOB__c}}\",\n            \"Target_Level__c\" : \"Customer\",\n            \"User__c\" : \"@{NewAccountOwner.Id}\",\n            \"POC_Branch__c\" : \"{{branchId}}\"\n\n\t\t}\n    }]\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/composite",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"composite"
+					]
+				},
+				"description": "Executes actions on multiple records in one request. Use SObject Collections to reduce the number of round-trips between the client and server. This resource is available in API version 42.0 and later.\n\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Contact",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"for(var i=0; i<obj.compositeResponse.length; i++){\r",
+							"    if(obj.compositeResponse[i].referenceId == 'ContactInfo'){\r",
+							"        pm.environment.set('contactId', obj.compositeResponse[i].body.Id);\r",
+							"    }\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"allOrNone\" : true,\n    \"compositeRequest\" : [{\n        \"method\" : \"POST\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Master_People__c\",\n        \"referenceId\" : \"MasterPeople\",\n        \"body\" : {  \n            \"First_Name__c\" : \"{{conFirstName}}\",\n\t\t\t\"Last_Name__c\" : \"{{conLastName}}\",\n            \"Personal_Email__c\" : \"{{contactEmail}}\",\n            \"Phone__c\" : \"{{conPhone}}\"\n        }\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+recordtype+where+sobjecttype=%27contact%27+and+name=%27Contact%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"recType\"\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"NewMPInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Master_People__c/@{MasterPeople.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"NewContact\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Contact\",\n        \"body\" : {  \n            \"AccountId\"\t: \"{{accountId}}\",\n            \"Address_Line_1__c\" : \"{{contactStreetAddress}}\",\n            \"Authorized_to_Work_in_CA__c\" : true,\n            \"Branch__c\" : \"{{branchId}}\",\n            \"Business_Email__c\" : \"{{contactBusEmail}}\",\n            \"City__c\" : \"Winnipeg\",\n            \"Confidential__c\" : false,\n            \"Conv_Perm_Placed__c\" : false,\n            \"Country_of_Record__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Country__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Current_Archive_Flag__c\" : false,\n            \"Email\" :\t\"{{contactEmail}}\",\n            \"Email_Opted_Out__c\" : false,\n            \"Fax_Opted_out__c\" : true,\n            \"FirstName\" :\t\"{{conFirstName}}\",\n            \"Flag_For_RHD_Rematch__c\" : false,\n            \"Inactive__c\" : false,\n            \"Job_Title__c\" : \"AP\",\n            \"LastName\"\t: \"{{conLastName}}\",\n            \"Marketplace_Actionable__c\" : false,\n            \"Marketplace_Contact__c\" : false,\n            \"MarketPlace_User__c\" : false,\n            \"Master_People__c\" : \"@{NewMPInfo.Id}\",\n            \"Online_Approver__c\" : true,\n            \"OtherCountry\":\"{{CA_Country_of_Record__c}}\",\n            \"Paf_Enabled_Flag__c\" : false,\n            \"Personal_Email_Unsubscribed__c\" : false,\n            \"Phone\" : \"{{phone}}\",\n            \"Postcode__c\" : \"{{CAPostalCode}}\",\n            \"Post_Opted_Out__c\" : true,\n            \"Potential_Consultant__c\" : false,\n            \"RecordTypeId\": \"@{recType.records[0].Id}\",\n            \"RHMP_Authorized_to_Work_in_US__c\" : false,\n            \"RHMP_ContactByText__c\" : false,\n            \"RHMP_NoShowPassSureModal__c\" : false,\n            \"RHMP_Over_18_Years_of_Age__c\" : false,\n            \"SMS_Opted_Out__c\" : true,\n            \"State_Province__c\" : \"{{CA_State__c}}\",\n            \"Temp__c\" : false,\n            \"Willing_to_Relocate__c\" : false,\n            \"Willing_to_Work_Remote__c\" : false\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"ContactInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Contact/@{NewContact.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"PJobFunction\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Job_Function__c\",\n        \"body\" : {  \n            \"Person__c\" : \"@{ContactInfo.Id}\",\n            \"Job_Function__c\" : \"{{jobfunctionId}}\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"PJobFunctionInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Job_Function__c/@{PJobFunction.id}\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+skill__c+where+name=%27Audit%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"skillId\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"PeopleSkil\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Skill__c\",\n        \"body\" : {  \n            \"Expertise__c\" : \"Not Rated\",\n            \"Person__c\" : \"@{ContactInfo.Id}\",\n            \"Skill_Source__c\" : \"Historical\",\n            \"Skill__c\" :\"{{skillId}}\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"PeopleSkillInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Skill__c/@{PeopleSkil.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"PeopleAddress\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Address__c\",\n        \"body\" : {  \n            \"Address_Line_1__c\" : \"{{contactStreetAddress}}\",\n            \"City__c\" : \"{{contactCity}}\",\n            \"CountryLookUp__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Country_of_Record__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Person__c\" : \"@{ContactInfo.Id}\",\n            \"Postcode__c\" : \"{{CAPostalCode}}\",\n            \"State__c\" : \"{{CA_State__c}}\",\n            \"Type__c\" : \"Main\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"PeopleAddressInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Address__c/@{PeopleAddress.id}\"\n    },{\n        \"method\" : \"PATCH\",\n        \"referenceId\" : \"patchContact\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Contact/@{ContactInfo.Id}\",\n        \"body\" : {\n            \"Main_Address__c\":\"@{PeopleAddressInfo.Id}\",\n            \"OtherCountry\": \"@{PeopleAddressInfo.Id}\",\n            \"AccountId\": \"{{accountId}}\"\n\t\t}\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"NewContactPhone\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/MP_Phone__c\",\n        \"body\" : {  \n            \"Name__c\" : \"@{NewMPInfo.Id}\",\n            \"Phone_Country_Code__c\" : \"1\",\n            \"Phone_Number__c\" : \"{{conPhone}}\",\n            \"Preferred_Mobile__c\" : \"true\",\n            \"Primary__c\" : \"true\",\n            \"Type__c\" : \"Personal Mobile\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"NewAccountOwner\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/User/@{NewMPInfo.OwnerId}?fields=Name,EmployeeNumber\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"NewPOC\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Candidate_POC__c\",\n        \"body\" : {  \n            \"People__c\" : \"@{ContactInfo.Id}\",\n            \"LOB__c\" : \"{{OT_LOB__c}}\",\n            \"Owner__c\" : \"true\",\n            \"User__c\" : \"@{NewAccountOwner.Id}\"\n\n\t\t}\n    }]\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/composite",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"composite"
+					]
+				},
+				"description": "Executes actions on multiple records in one request. Use SObject Collections to reduce the number of round-trips between the client and server. This resource is available in API version 42.0 and later.\n\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Candidate",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"for(var i=0; i<obj.compositeResponse.length; i++){\r",
+							"    if(obj.compositeResponse[i].referenceId == 'NewMPInfo'){\r",
+							"        pm.environment.set('peopleNumber', obj.compositeResponse[i].body.People_Number__c);\r",
+							"    }\r",
+							"\r",
+							"     if(obj.compositeResponse[i].referenceId == 'ContactInfo'){\r",
+							"        pm.environment.set('candidateId', obj.compositeResponse[i].body.Id);\r",
+							"    }\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"allOrNone\" : true,\n    \"compositeRequest\" : [{\n        \"method\" : \"POST\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Master_People__c\",\n        \"referenceId\" : \"MasterPeople\",\n        \"body\" : {  \n            \"First_Name__c\" : \"{{firstName}}\",\n\t\t\t\"Last_Name__c\" : \"{{lastName}}\",\n            \"Personal_Email__c\" : \"{{email}}\",\n            \"Phone__c\" : \"{{phone}}\"\n        }\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+recordtype+where+sobjecttype=%27contact%27+and+name=%27Candidate%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"recType\"\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"NewMPInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Master_People__c/@{MasterPeople.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"NewContact\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Contact\",\n        \"body\" : {  \n            \"Master_People__c\" : \"@{NewMPInfo.Id}\",\n            \"Original_Source__c\" : \"RH Website\",\n            \"Branch__c\" : \"{{branchId}}\",\n            \"RecordTypeId\": \"@{recType.records[0].Id}\",\n            \"Perm_Status__c\" : \"Pre-reg\",\n            \"Temp_Status__c\" : \"Active\",\n            \"Hourly_Required__c\" : 20,\n            \"Daily_Required__c\" : 120,\n            \"Monthly_Required__c\": 6000,\n            \"Annual_Required__c\" : 120000,\n            \"Job_Function__c\" : \"{{jobfunctionId}}\",\n            \"Interview_Status__c\" : \"Interviewed\",\n            \"Country_of_Record__c\" : \"{{CA_Country_of_Record__c}}\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"ContactInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Contact/@{NewContact.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"PJobFunction\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Job_Function__c\",\n        \"body\" : {  \n            \"Person__c\" : \"@{ContactInfo.Id}\",\n            \"Job_Function__c\" : \"{{jobfunctionId}}\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"PJobFunctionInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Job_Function__c/@{PJobFunction.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"PeopleSkil\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Skill__c\",\n        \"body\" : {  \n            \"Expertise__c\" : \"Not Rated\",\n            \"Person__c\" : \"@{ContactInfo.Id}\",\n            \"Skill_Source__c\" : \"Historical\",\n           \"Skill__c\" :\"{{skillId}}\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"PeopleSkillInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Skill__c/@{PeopleSkil.id}\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"PeopleAddress\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Address__c\",\n        \"body\" : {  \n            \"Address_Line_1__c\" : \"4567\",\n            \"City__c\" : \"Pleasanton\",\n            \"CountryLookUp__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Country_of_Record__c\" : \"{{CA_Country_of_Record__c}}\",\n            \"Person__c\" : \"@{ContactInfo.Id}\",\n            \"Postcode__c\" : \"{{CAPostalCode}}\",\n            \"State__c\" : \"{{CA_State__c}}\",\n            \"Type__c\" : \"Main\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"PeopleAddressInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/People_Address__c/@{PeopleAddress.id}\"\n    },{\n        \"method\" : \"PATCH\",\n        \"referenceId\" : \"patchContact\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Contact/@{ContactInfo.Id}\",\n        \"body\" : {\n            \"Main_Address__c\":\"@{PeopleAddressInfo.Id}\"\n\t\t}\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"NewContactPhone\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/MP_Phone__c\",\n        \"body\" : {  \n            \"Name__c\" : \"@{NewMPInfo.Id}\",\n            \"Phone_Country_Code__c\" : \"1\",\n            \"Phone_Number__c\" : \"{{phone}}\",\n            \"Preferred_Mobile__c\" : \"true\",\n            \"Primary__c\" : \"true\",\n            \"Type__c\" : \"Personal Mobile\"\n\t\t}\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"NewAccountOwner\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/User/@{NewMPInfo.OwnerId}?fields=Name,EmployeeNumber\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"NewPOC\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Candidate_POC__c\",\n        \"body\" : {  \n            \"People__c\" : \"@{ContactInfo.Id}\",\n            \"LOB__c\" : \"{{OT_LOB__c}}\",\n            \"Owner__c\" : \"true\",\n            \"User__c\" : \"@{NewAccountOwner.Id}\"\n\n\t\t}\n    }]\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/composite",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"composite"
+					]
+				},
+				"description": "Executes actions on multiple records in one request. Use SObject Collections to reduce the number of round-trips between the client and server. This resource is available in API version 42.0 and later.\n\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "Create CCE and Salary Details",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"varRandomSSN = Math.random().toString().slice(2,11);\r",
+							"pm.environment.set('randmonSSN',varRandomSSN);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"setTimeout(function(){}, ['20000']);\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"allOrNone\" : true,\n    \"compositeRequest\" : [{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"CCEInfo\",\n        \"url\" : \"/services/data/v44.0/query?q=select+Id+from+Candidate_Country_Eligibility__c+where+Candidate__c='{{candidateId}}'\"\n    },{\n        \"method\" : \"PATCH\",\n        \"referenceId\" : \"PatchCCE\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Candidate_Country_Eligibility__c/@{CCEInfo.records[0].Id}\",\n        \"body\" : {  \n            \"Can_Work__c\" :false,\n            \"Copy_of_Chamber_of_Commerce_Extract__c\" :false,\n            \"Does_Candidate_s_Partner_have_an_income__c\" :false,\n            \"Eligible_to_work_in_this_Country__c\" :true,\n            \"Exempt_No_Federal__c\" :\"0.0\",\n            \"Exempt_No_State__c\" :\"0.0\",\n            \"E_Pay_Slip__c\" :false,\n            \"Have_you_ever_been_convicted_of_a_Felony__c\" :false,\n            \"Have_you_ever_been_convicted_statutory__c\" :false,\n            \"HEA__c\" :false,\n            \"Int_Last_Approved_Effective_Date__c\" :\"{{todayDate}}\",\n            \"Int_Last_Approved_Salary_Type__c\" :\"Hourly\",\n            \"I_9__c\" :true,\n            \"Marital_Federal__c\" :\"Single\",\n            \"Marital_State__c\" :\"Single\",\n            \"National_ID__c\" :\"{{randmonSSN}}\",\n            \"Pay_Check_Cheque_Destination__c\" :\"Mail Home\",\n            \"Perm_Documentation_Score__c\" :\"0.0\",\n            \"Perm_Documentation_Status__c\" :\"Not Ready\",\n            \"Phase_System__c\" :false,\n            \"Salary_Frequency__c\" :\"Weekly\",\n            \"Net_Claim_Amt_Federal__c\":\"0.0\",\n            \"WA__c\":true,\n            \"Tax_Exempt_Federal__c\" :false,\n            \"Tax_Exempt_State__c\" :false,\n            \"Temp_Documentation_Score__c\" :\"0.0\",\n            \"Temp_Documentation_Status__c\" :\"Not Ready\",\n            \"UFS_SPS__c\" :\"US_NONSPS\",\n            \"Wage_Tax_Statement__c\" :false\t\n        }\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+Job_Function_Product__c\",\n        \"method\": \"GET\",\n            \"referenceId\": \"jobFunctionProduct\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"SalaryDetails\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Salary_Detail__c\",\n        \"body\" : { \n\t\t\t\"Action_Code_Changed_Flag__c\" : true,\n\t\t\t\"Action_Code__c\" : \"HIR - Hourly Hire\",\n\t\t\t\"Action_Reason_Changed_Flag__c\" : true,\n\t\t\t\"Action_Reason__c\" : \"N/A - Not Applicable\",\n\t\t\t\"Action_StatusType_Chnged_Flg__c\" : true,\n\t\t\t\"Action_Status__c\" : \"A - Active\",\n\t\t\t\"Active_Flag__c\" : \"Y\",\n\t\t\t\"Approved_Date__c\" : \"{{todayDate}}\",\n\t\t\t\"Approved__c\" : \"Y\",\n\t\t\t\"Benefits_Prog_Category__c\" : \"None\",\n\t\t\t\"Ben_Prog_Catgry_Chnged_Flag__c\" : true,\n\t\t\t\"Candidate_Country_Eligibility__c\" : \"@{CCEInfo.records[0].Id}\",\n\t\t\t\"Earnings_Prog_Category__c\" : \"None\",\n\t\t\t\"Earn_Prog_Catgry_Chngd_Flg__c\" : true,\n\t\t\t\"First_Approval__c\" : false,\n\t\t\t\"Home_Branch__c\" : \"{{branchId}}\",\n\t\t\t\"Home_Brnch_Chngd_Flg__c\" : true,\n\t\t\t\"Home_Job_Function_Product__c\" :  \"@{jobFunctionProduct.records[0].Id}\",\n\t\t\t\"Home_Job_Func_Chngd_Flg__c\" : true,\n\t\t\t\"Home_LOB_Chngd_Flg__c\" : true,\n\t\t\t\"Home_LOB_Lookup__c\" : \"{{OT_LOB__c}}\",\n\t\t\t\"Home_Service_Chngd_Flg__c\" : true,\n\t\t\t\"Home_Service__c\" : \"TEMP\",\n\t\t\t\"PAF_Effective_Date__c\" : \"{{todayDate}}\",\n\t\t\t\"paf_required__c\" : false,\n\t\t\t\"Personnel_Status_Chngd_Flg__c\" : true,\n\t\t\t\"Personnel_Status__c\" : \"EMPLOYEE\",\n\t\t\t\"Salary_Changed_Flag__c\" : false,\n\t\t\t\"Salary_Rate_Effective_Date__c\" : \"{{todayDate}}\",\n\t\t\t\"Salary_Type_Changed_Flag__c\" : true,\n\t\t\t\"Salary_Type_Effective_Date__c\" : \"{{todayDate}}\",\n\t\t\t\"Salary_Type__c\" : \"Hourly\",\n\t\t\t\"Second_Approval__c\" : false,\n\t\t\t\"Sequence_ID__c\" : \"1.0\",\n\t\t\t\"Supervisor_Changed_Flag__c\" : false,\n\t\t\t\"Supervisor__c\" : \"\"\n\t\t}\n    }]\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/composite",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"composite"
+					]
+				},
+				"description": "Executes actions on multiple records in one request. Use SObject Collections to reduce the number of round-trips between the client and server. This resource is available in API version 42.0 and later.\n\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "Create Open Joborder - Temp",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var sequenceNumber = Number(pm.environment.get('companyNameCounter'));\r",
+							"if (sequenceNumber == undefined){\r",
+							"    sequenceNumber = 0;\r",
+							"}\r",
+							"\r",
+							"//Account name \r",
+							"//QA + [2 letter country ISO abbreviation] + TEST + Testers Initials + NN(sequential number)\r",
+							"//QAUSTESTCOMPAUTOSP(random number )\r",
+							"pm.environment.set('accountName','QA' + pm.environment.get('CountryInitials') \r",
+							"                    + 'TESTCOMPAUTO' + pm.environment.get('TesterInitials') \r",
+							"                    + sequenceNumber);\r",
+							"\r",
+							"pm.environment.set('companyNameCounter',sequenceNumber + 1);  \r",
+							"\r",
+							"//main address\r",
+							"pm.environment.set('mainCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('mainStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('mainStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							"pm.environment.set('companyPhone',pm.variables.replaceIn(\"{{$randomPhoneNumber}}\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"for(var i=0; i<obj.compositeResponse.length; i++){\r",
+							"    if(obj.compositeResponse[i].referenceId == 'jo'){\r",
+							"        pm.environment.set('joborderId', obj.compositeResponse[i].body.id);\r",
+							"    }\r",
+							"}\r",
+							"\r",
+							"setTimeout(function(){}, ['30000']);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"allOrNone\" : true,\n    \"compositeRequest\" : [{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"AccountInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Account/Id/{{accountId}}\"\n    },{\n        \"url\": \"/services/data/v44.0/query?q=select+Id+from+recordtype+where+sobjecttype=%27Job_Order__c%27+and+name=%27Temp%20Placed%27\",\n        \"method\": \"GET\",\n            \"referenceId\": \"recTypeJo\"\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"jfpr\",\n        \"url\" : \"/services/data/v44.0/query?q=select+Id,+Job_Function__c+from+Job_Function_Product__c+where+Job_Function__r.Name=%27Front%20Desk%20Coordinator%27+limit+1\"\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"BO\",\n        \"url\" : \"/services/data/v44.0/query?q=select+Id+from+Billing_Option__c+where+company__c='@{AccountInfo.Id}'\"\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"refPoc\",\n        \"url\" : \"/services/data/v44.0/query?q=select+Id,+Networkid__c+from+User+where+Networkid__c='{{poc1}}'\"\n    },{\n        \"method\" : \"POST\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Order__c\",\n        \"referenceId\" : \"jo\",\n        \"body\" : {  \n            \"Account__c\":\"@{AccountInfo.Id}\",\n            \"Administrative_Fee_Processed__c\":\"No\",\n            \"Administrative_Fee__c\":0.0,\n            \"Amendment_Awaiting_Approval__c\":false,\n            \"Approved_By_Manager__c\":false,\n            \"Awaiting_Approval__c\":false,\n            \"Billing_Address__c\":\"@{AccountInfo.Primary_Billing_Address__c}\",\n            \"Billing_Option__c\":\"@{BO.records[0].Id}\",\n            \"Branch__c\":\"{{branchId}}\",\n            \"Burden__c\":20.26,\n            \"Company_Address__c\":\"@{AccountInfo.Main_Address__c}\",\n            \"Confidential__c\":false,\n            \"Conversion__c\":false,\n            \"Country_Lookup__c\":\"@{AccountInfo.Country_of_Record__c}\",\n            \"Credit_Approved__c\":false,\n            \"Day_of_week_for_Follow_up_Calls__c\":\"Monday\",\n            \"Double_Time_Cost__c\":44.09,\n            \"Double_Time_GM_Percent__c\":41.99,\n            \"Double_Time_Gross_Margin__c\":31.91,\n            \"Double_Time_Markup__c\":107.31,\n            \"DT_Bill_Rate__c\":76.0,\n            \"DT_Pay_Rate__c\":36.66,\n            \"DT_Rate_Bill_Factor__c\":2.0,\n            \"DT_Rate__c\":0.0,\n            \"Employment_Guarantee__c\":false,\n            \"Employment_Type__c\":\"Temp\",\n            \"End_Date__c\":\"{{futureExpiryDate}}\",\n            \"Follow_Up_Call_Desired__c\":true,\n            \"Follow_up_Call_Recurrence__c\":\"Weekly\",\n            \"Follow_up_of_Days_After_1st_Day_Call__c\":2.0,\n            \"Follow_up_of_Days_Before_Last_Day_Call__c\":2.0,\n            \"Fulfillment_Method__c\":\"Standard RH LOBs\",\n            \"Health_Welfare_Benefit_Rate__c\":0.0,\n            \"Highlight__c\":\"3/10 Waiting for the client to approve bill rates. Present Tamieka\",\n            \"Hours_Per_Week__c\":40,\n            \"JobFunction__c\":\"@{jfpr.records[0].Job_Function__c}\",\n            \"Joborder_Service_Type__c\":\"Temp\",\n            \"Job_Description__c\":\"ESSENTIAL FUNCTIONS Reasonable accommodations may be made to enable individuals with disabilities to perform the essential functions. • Process guest check-ins and room assignments following the hotel’s rate structures, discounts, and sell/upsell strategies. Accommodate special requests when possible. • Process check-in/check-out and collect payments in compliance with cash handling, credit card processing and accounting policies and procedures. • Answer inquiries about hotel services, in-house events, directions, local attractions, etc. Assist guests with check cashing, safety boxes, additional guest room keys, transportation, etc. • If necessary, walk guests in a professional and courteous manner and in compliance with policies, procedures and brand stands. • Pre-register, block reservations and, as appropriate, take same day and future reservations. Cancel room reservations according to policies and procedures. • Ensure release of any Company, hotel, brand and guest information is consistent with privacy policies, practices and regulations. • On time and at work when scheduled and in proper uniform. • Attend department meetings as scheduled. • Consistent professional and positive attitude and actions when communicating with guests and associates. • Comply with policies and procedures. Practice safe work habits and comply with sanitary, safety, security and emergency procedures. Write shift reports including reports on any incidents of theft, accidents or injuries when assigned. Check with manager / supervisor before leaving work area for any reason. • Perform special projects and other responsibilities as assigned. Participate in task forces and committees as requested. • Any other duties / tasks as requested by management.\",\n            \"Job_Function_Product__c\":\"@{jfpr.records[0].Id}\",\n            \"Job_Order_Contact__c\":\"{{contactId}}\",\n            \"Job_Order_Division__c\":\"AT\",\n            \"Job_Owners_Phone__c\":\"(415) 434-4940\",\n            \"Job_Reason__c\":\"Increase in Workload/Project\",\n            \"Job_Source__c\":\"Call or Email In\",\n            \"Job_Status__c\":\"Open\",\n            \"Job_Title1__c\":\"Front Desk Agent\",\n            \"JO_Branch_Code__c\":\"00090-01\",\n            \"JO_Branch_Name__c\":\"00090-01 - Santa Rosa, CA (AT,OT,RHFA)\",\n            \"JO_District_Code__c\":\"85520\",\n            \"JO_District_Name__c\":\"85520 - Marinovich District\",\n            \"JO_Division_Code__c\":\"00090-0104\",\n            \"JO_Division_Name__c\":\"00090-0104 - Santa Rosa-Temp OT\",\n            \"JO_Region_Code__c\":\"88930\",\n            \"JO_Region_Name__c\":\"88930 - Stiener-Murphy Region\",\n            \"JO_Senior_District_Code__c\":\"08670-01\",\n            \"JO_Senior_District_Name__c\":\"08670-01 - Steel Sr. District\",\n            \"JO_Team_Code__c\":\"00090-0104-000\",\n            \"JO_Zone_Code__c\":\"08910\",\n            \"JO_Zone_Name__c\":\"08910 - West and Southwest Operations\",\n            \"LOB__c\":\"{{OT_LOB__c}}\",\n            \"Location__c\":\"{{branchId}}\",\n            \"OT_Bill_Rate_1__c\":57.0,\n            \"OT_Bill_Rate_2__c\":0.0,\n            \"OT_DT_Pre_Approval_Required__c\":false,\n            \"OT_Pay_Rate_1__c\":27.5,\n            \"OT_Pay_Rate_2__c\":0.0,\n            \"OT_Rate_1_Bill_Factor__c\":1.5,\n            \"OT_Rate_1__c\":0.0,\n            \"OT_Rate_2__c\":0.0,\n            \"Overtime_Cost__c\":33.07,\n            \"Overtime_GM_Percent__c\":41.98,\n            \"Overtime_Gross_Margin__c\":23.93,\n            \"Overtime_Markup__c\":107.27,\n            \"Payroll_Entry__c\":true,\n            \"Pay_Action__c\":\"Pay & Bill\",\n            \"Pay_Bill_Rate_Per__c\":\"Hourly\",\n            \"Pay_Rate_Type__c\":\"Hourly\",\n            \"Pay_Record_Processed__c\":false,\n            \"Pay_Up_To__c\":22.0,\n            \"Pending_Leads_Exist__c\":false,\n            \"Perm_Conv_FTC_Fee_Processed__c\":\"No\",\n            \"Prevailing_Wage__c\":0.0,\n            \"Product_Code__c\": 35,\n            \"Quality_Call_Recurrence_Interval__c\":7.0,\n            \"RecordTypeId\" : \"@{recTypeJo.records[0].Id}\",\n            \"Regular_Bill_Factor__c\":0.0,\n            \"Regular_Bill_Rate__c\":38.0,\n            \"Regular_Cost__c\":22.04,\n            \"Regular_GM_Percent__c\":41.99,\n            \"Regular_Gross_Margin__c\":15.96,\n            \"Regular_Markup__c\":107.31,\n            \"Regular_Pay_Rate__c\":18.33,\n            \"Remote__c\":\"No\",\n            \"Re_evaluate_Candidate_Rules__c\":false,\n            \"RH_Notice_to_Terminate__c\":\"Immediately\",\n            \"Send_Wage_Letter_Reminder__c\":true,\n            \"Shortlist_Fee_Processed__c\":\"No\",\n            \"Start_Date__c\":\"{{todayDate}}\",\n            \"Supervises_Others__c\":\"Yes\",\n            \"Total_Bill_Hours__c\":0.0,\n            \"Trade_Union__c\":false,\n            \"Validation_Pending__c\":true\n        }\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"JoborderInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Order__c/@{jo.id}\"\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"JobordPosting\",\n        \"url\" : \"/services/data/v44.0/query?q=select+Id+from+Web_Job_Posting__c+where+Job_Order__c='@{JoborderInfo.Id}'\"\n    },{\n        \"method\" : \"POST\",\n        \"referenceId\" : \"JobSkil\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Skill__c\",\n        \"body\" : {  \n            \"Job_Order__c\" : \"@{jo.id}\",\n            \"Skill__c\" : \"{{skillId}}\",\n            \"Desired_Score_Type__c\":\"KPH\"\n\t\t}\n    },{\n        \"method\": \"POST\",\n        \"referenceId\": \"joClass\",\n        \"url\":\"/services/data/v{{version}}/sobjects/Job_Classification__c\",\n        \"body\":{\n            \"Name\": \"Receptionist\",\n            \"Active_Flag__c\":true,\n            \"Country_Lookup__c\":\"@{AccountInfo.Country_of_Record__c}\",\n            \"Lob_lookup__c\":\"{{OT_LOB__c}}\",\n             \"Job_Classification_Id__c\":\"1.0\",\n            \"Mnemonic_Code__c\":\"nwlp\"\n        }\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"joClassfic\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Classification__c/@{joClass.id}\"\n    },{\n        \"method\": \"POST\",\n        \"referenceId\": \"joPost\",\n        \"url\":\"/services/data/v{{version}}/sobjects/Web_Job_Posting__c\",\n        \"body\":{\n            \"Job_Order__c\":\"@{jo.id}\",\n            \"Name\":\"@{JoborderInfo.Name}\",\n            \"Approved__c\":true,\n            \"LOB__c\":\"{{OT_LOB__c}}\",\n            \"Branch__c\":\"{{branchId}}\",\n             \"City__c\":\"{{companyCity}}\",\n            \"Job_Function__c\":\"@{jfpr.records[0].Job_Function__c}\",\n            \"Description_of_Position_rtf__c\":\"@{JoborderInfo.Job_Description__c}\",\n            \"Description_of_Position__c\":\"@{JoborderInfo.Job_Description__c}\",\n            \"Employment_Type__c\":\"Temp\",\n            \"End_Date__c\":\"{{futureExpiryDate}}\",\n            \"Job_Title__c\":\"@{JoborderInfo.Job_Title1__c}\",\n            \"INT_Job_Order_Number_c__c\":\"@{JoborderInfo.Name}\",\n            \"L_company_name__c\": \"@{AccountInfo.Id}\", \n            \"Country__c\":\"@{AccountInfo.Country_of_Record__c}\",\n            \"NS_Request_Send_Time__c\":\"{{todayDate}}\",\n            \"NS_Request_Status__c\":\"Failure\",\n            \"NS_Response_Receive_time__c\":\"{{todayDate}}\",\n            \"Salary_Rate_Type__c\":\"@{JoborderInfo.Pay_Rate_Type__c}\",\n            \"Pay_Rate_To__c\":100.00,\n            \"Pay_Rate_From__c\":80.00,\n            \"Rate_Type_Identifier__c\":\"Hourly\",\n            \"Postcode__c\":\"{{CAPostalCode}}\",\n            \"State_Province__c\":\"{{CA_State__c}}\",\n            \"Job_Type__c\":\"Temp\",\n            \"Job_Classification__c\":\"@{joClass.id}\"\n           }\n    },{\n        \"method\" : \"PATCH\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Order__c/@{JoborderInfo.Id}\",\n        \"referenceId\" : \"joborderPatch\",\n        \"body\" : {  \n            \"Web_Job_Posting__c\" : \"@{joPost.id}\"\n        }\n    }]\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/composite",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"composite"
+					]
+				},
+				"description": "Executes actions on multiple records in one request. Use SObject Collections to reduce the number of round-trips between the client and server. This resource is available in API version 42.0 and later.\n\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "Place Joborder - Temp",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var sequenceNumber = Number(pm.environment.get('companyNameCounter'));\r",
+							"if (sequenceNumber == undefined){\r",
+							"    sequenceNumber = 0;\r",
+							"}\r",
+							"\r",
+							"//Account name \r",
+							"//QA + [2 letter country ISO abbreviation] + TEST + Testers Initials + NN(sequential number)\r",
+							"//QAUSTESTCOMPAUTOSP(random number )\r",
+							"pm.environment.set('accountName','QA' + pm.environment.get('CountryInitials') \r",
+							"                    + 'TESTCOMPAUTO' + pm.environment.get('TesterInitials') \r",
+							"                    + sequenceNumber);\r",
+							"\r",
+							"pm.environment.set('companyNameCounter',sequenceNumber + 1);  \r",
+							"\r",
+							"//main address\r",
+							"pm.environment.set('mainCity', pm.variables.replaceIn(\"{{$randomCity}}\"));\r",
+							"pm.environment.set('mainStreetName',pm.variables.replaceIn(\"{{$randomStreetName}}\"));\r",
+							"pm.environment.set('mainStreetAddress',pm.variables.replaceIn(\"{{$randomStreetAddress}}\"));\r",
+							"pm.environment.set('companyPhone',pm.variables.replaceIn(\"{{$randomPhoneNumber}}\"));"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"setTimeout(function(){}, ['50000']);\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"allOrNone\" : true,\n    \"compositeRequest\" : [{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"refPoc\",\n        \"url\" : \"/services/data/v44.0/query?q=select+Id,+Name,Networkid__c+from+User+where+Networkid__c='{{poc1}}'\"\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"JoborderInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Order__c/Id/{{joborderId}}\"\n    },{\n        \"method\" : \"POST\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Point_of_Contact__c\",\n        \"referenceId\" : \"JobPointOfContact\",\n        \"body\" : {  \n            \"Bill_Office__c\" : \"true\",\n            \"Branch_Split__c\" : \"100.0\",\n            \"Coordinator_POC_Split__c\" : \"25.0\",\n            \"Coordinator__c\" : \"true\",\n            \"Job_Order__c\" : \"{{joborderId}}\",\n            \"Name\" : \"@{refPoc.records[0].Name}\",\n            \"POC_Branch__c\" : \"{{branchId}}\",\n            \"POC_EDW_Branch_Code__c\" : \"00090-01\",\n            \"POC_EDW_Branch_Name__c\" : \"00090-01 - Santa Rosa, CA (AT,OT,RHFA)\",\n            \"POC_EDW_District_Code__c\" : \"85520\",\n            \"POC_EDW_District_Name__c\" : \"85520 - Marinovich District\",\n            \"POC_EDW_Division_Code__c\" : \"00090-0104\",\n            \"POC_EDW_Division_Name__c\" : \"00090-0104 - Santa Rosa-Temp OT\",\n            \"POC_EDW_Metro_Market_Code__c\" : \"\",\n            \"POC_EDW_Metro_Market_Name__c\" : \"\",\n            \"POC_EDW_Region_Code__c\" : \"88930\",\n            \"POC_EDW_Region_Name__c\" : \"88930 - Stiener-Murphy Region\",\n            \"POC_EDW_Rollup_Branch_Code__c\" : \"\",\n            \"POC_EDW_Rollup_Branch_Name__c\" : \"\",\n            \"POC_EDW_Senior_District_Code__c\" : \"08670-01\",\n            \"POC_EDW_Senior_District_Name__c\" : \"08670-01 - Steel Sr. District\",\n            \"POC_EDW_Senior_Region_Code__c\" : \"\",\n            \"POC_EDW_Senior_Region_Name__c\" : \"\",\n            \"POC_EDW_Team_Code__c\" : \"00090-0104-000\",\n            \"POC_EDW_Zone_Code__c\" : \"08910\",\n            \"POC_EDW_Zone_Name__c\" : \"08910 - West and Southwest Operations\",\n            \"POC_LOB__c\" : \"{{OT_LOB__c}}\",\n            \"Recruiter_POC_Split__c\" : \"25.0\",\n            \"Recruiter__c\" : \"true\",\n            \"Sales_Rep_POC_Split__c\" : \"50.0\",\n            \"Sales_Rep__c\" : \"true\",\n            \"Trigger_Generated__c\" : \"false\",\n            \"User__c\" : \"@{refPoc.records[0].Id}\"   \n        }\n    },{\n        \"method\" : \"GET\",\n        \"referenceId\" : \"JobPointOfContactInfo\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Point_of_Contact__c/Id/@{JobPointOfContact.id}\"\n    },{\n        \"method\" : \"PATCH\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Order__c/@{JoborderInfo.Id}\",\n        \"referenceId\" : \"joborderPatch\",\n        \"body\" : {  \n            \"Job_Point_of_Contact__c\":\"@{JobPointOfContactInfo.Id}\",\n            \"Job_Status__c\":\"Active\",\n            \"Selected_Candidate__c\" : \"{{candidateId}}\",\n            \"POC_NetworkID_TypeC__c\":\"{{poc1}}C\",\n            \"POC_NetworkID_TypeO__c\":\"{{poc1}}O\",\n            \"POC_NetworkID_TypeR__c\":\"{{poc1}}R\"\n        }\n    },{\n        \"method\" : \"POST\",\n        \"url\" : \"/services/data/v{{version}}/sobjects/Job_Order_Secondary_Contact__c\",\n        \"referenceId\" : \"joborderSecondary\",\n        \"body\" : {  \n            \"Alternate_Online_Approver__c\" : false,\n            \"Bill_To__c\" : true,\n            \"Company__c\" : \"{{accountId}}\",\n            \"Contact__c\" : \"{{contactId}}\",\n            \"Job_Order__c\" : \"{{joborderId}}\",\n            \"Online_Approver__c\" : true,\n            \"Order_Placer__c\" : true,\n            \"Primary__c\" : true,\n            \"Report_To__c\" : true\n        }\n    }]\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/composite",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"composite"
+					]
+				},
+				"description": "Executes actions on multiple records in one request. Use SObject Collections to reduce the number of round-trips between the client and server. This resource is available in API version 42.0 and later.\n\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_composite_sobjects_collections.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "Fetch_Registrant__c",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.stringify(pm.response.json());\r",
+							"const obj = JSON.parse(jsonData);\r",
+							"\r",
+							"//making sure we got 200 OK\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"var registrant_id = obj.records[0].Id;\r",
+							"var verificationCode = obj.records[0].Verification_Code__c;\r",
+							"console.log('verificationCode: ' + verificationCode);\r",
+							"pm.environment.set('registrantId', registrant_id);\r",
+							"pm.environment.set('verificationCode', verificationCode);\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"    //parse the response json and test three properties\r",
+							"    const responseJson = pm.response.json();\r",
+							"    pm.expect(obj.records[0].Country_Code__c).to.eql('CA');\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v48.0/query/?q=Select+Authorized_to_Work_in_US__c,Contact__r.Name,Contact__r.Marketplace_Contact__c,Country_Code__c,CreatedById,CreatedDate,CurrencyIsoCode,Date_Sent__c,Date_Verified__c,Email_Sent__c,Email_verification_URL__c,Email__c,Expiration_Date__c,First_Name__c,Id,IsDeleted,Job_Order__c,Language_Locale__c,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,Last_Name__c,Line_of_Business__c,LinkedIn_Profile__c,Name,Over_18_Years_of_Age__c,OwnerId,Password__c,Phone_Number__c,Phone_Type__c,Photo__c,Postal_Code__c,Record_Type__c,Resume_File_Name__c,Source__c,SystemModstamp,TCAST_Access__c,Type__c,User__c,Verification_Code__c,Verification_Link_Source__c,Verified__c+FROM+Registrants__c+WHERE Email__c+=+'{{email}}'",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v48.0",
+						"query",
+						""
+					],
+					"query": [
+						{
+							"key": "q",
+							"value": "Select+Authorized_to_Work_in_US__c,Contact__r.Name,Contact__r.Marketplace_Contact__c,Country_Code__c,CreatedById,CreatedDate,CurrencyIsoCode,Date_Sent__c,Date_Verified__c,Email_Sent__c,Email_verification_URL__c,Email__c,Expiration_Date__c,First_Name__c,Id,IsDeleted,Job_Order__c,Language_Locale__c,LastModifiedById,LastModifiedDate,LastReferencedDate,LastViewedDate,Last_Name__c,Line_of_Business__c,LinkedIn_Profile__c,Name,Over_18_Years_of_Age__c,OwnerId,Password__c,Phone_Number__c,Phone_Type__c,Photo__c,Postal_Code__c,Record_Type__c,Resume_File_Name__c,Source__c,SystemModstamp,TCAST_Access__c,Type__c,User__c,Verification_Code__c,Verification_Link_Source__c,Verified__c+FROM+Registrants__c+WHERE Email__c+=+'{{email}}'",
+							"description": "A SOQL query. Note that you will need to replace spaces with “+” characters in your query string to create a valid URI. An example query parameter string might look like: “SELECT+Name+FROM+MyObject”. If the SOQL query string is invalid, a MALFORMED_QUERY response is returned."
+						}
+					]
+				},
+				"description": "Executes the specified SOQL query.\n\nIf the query results are too large, the response contains the first batch of results and a query identifier in the nextRecordsUrl field of the response. The identifier can be used in an additional request to retrieve the next batch.\nhttps://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/resources_query.htm"
+			},
+			"response": []
+		},
+		{
+			"name": "ValidateEmailLink",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);",
+							"pm.test(\"response must be valid and have a body\", function(){",
+							"     pm.response.to.be.ok; ",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; ",
+							"});",
+							"",
+							"",
+							"pm.test(\"Validate Status code should be 200\", function () {",
+							"   pm.expect(data.returnCode).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Email found and no associated user record: true.\", function(){",
+							"    pm.expect(data.validationStatus).to.equal(\"noWebAccount\");",
+							"});",
+							"",
+							"",
+							"pm.test(\"Email found and no associated user record\", function(){",
+							"    pm.expect(data.validationMessage).to.equal(\"Email found and no associated user record\");",
+							"});",
+							"",
+							"pm.test(\"Validate contact id should be null\", function(){",
+							"    pm.expect(data.contactId).not.equal(null);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"type": "text",
+						"value": "Bearer {{authToken}}",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"flowType\": \"register\",\r\n  \"email\": \"{{email}}\",\r\n  \"registrantId\": \"{{registrantId}}\",\r\n  \"verificationCode\": \"{{verificationCode}}\"\r\n}\r\n"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/validateemaillinks/register",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"validateemaillinks",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Account- Create Pwd",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.test(\"response must be valid and have a body\", function(){\r",
+							"     pm.response.to.be.ok; \r",
+							"     pm.response.to.be.withBody;\r",
+							"     pm.response.to.be.json; \r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Return code should be 200\", function () {\r",
+							"    pm.expect(data.returnCode).to.equal(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Message should be Successful\", function () {\r",
+							"    pm.expect(data.message).to.equal(\"SUCCESS\");\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"email\": \"{{email}}\",\n  \"registrantId\": \"{{registrantId}}\",\n  \"verificationCode\": \"{{verificationCode}}\",\n  \"country\": \"{{CACountryInitials}}\",\n  \"locale\": \"{{locale_ca}}\",\n  \"language\": \"{{locale_us}}\",\n  \"password\": \"{{password}}\",\n  \"authorizedToWorkCA\": true,\n  \"authorizedToWorkUS\": false,\n  \"ageVerification\": true\n}"
+				},
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/createaccount",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"createaccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login new",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//get the response from the call made...\r",
+							"var jsonResponse = JSON.parse(responseBody);\r",
+							"console.log(jsonResponse.result);\r",
+							"console.log(jsonResponse.returnCode);\r",
+							"\r",
+							"pm.test(\"Validate Response is not null\", function () {\r",
+							"    pm.expect(jsonResponse.result).not.equal(null);\r",
+							"});\r",
+							"\r",
+							"//call the second url\r",
+							"const reqObject = {\r",
+							"  url: jsonResponse.result,\r",
+							"  method: 'GET',\r",
+							"  header: 'Content-Type:application/x-www-form-urlencoded'\r",
+							"};\r",
+							"\r",
+							"//build the authorize url\r",
+							"const reqObject2 = {\r",
+							"  url: pm.environment.get('_endpoint') + '/services/oauth2/authorize?client_id=' \r",
+							"                 + pm.environment.get('client_id') + '&redirect_uri=SFDCAuth://callback&response_type=token',\r",
+							"  method: 'GET',\r",
+							"  header: 'Content-Type:application/x-www-form-urlencoded'\r",
+							"};\r",
+							"\r",
+							"//nested sendRequest\r",
+							"pm.sendRequest(reqObject, (err, res) => {\r",
+							"    //call the authorize url\r",
+							"    pm.sendRequest(reqObject2,(err, res) => {\r",
+							"      var str = res.text();\r",
+							"      var accessToken = decodeURI(str.substring(str.indexOf('access_token=')+13,\r",
+							"                            str.indexOf('refresh_token')-1)); \r",
+							"      // console.log(accessToken);\r",
+							"      pm.globals.set('authToken',accessToken);\r",
+							"    });\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": {
+					"raw": "{{_endpoint}}/servlet/servlet.loginwidgetcontroller?type=login&username={{email}}&password={{password}}&startURL=/services/oauth2/authorize?client_id={{client_id}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"servlet",
+						"servlet.loginwidgetcontroller"
+					],
+					"query": [
+						{
+							"key": "type",
+							"value": "login"
+						},
+						{
+							"key": "username",
+							"value": "{{email}}"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}"
+						},
+						{
+							"key": "startURL",
+							"value": "/services/oauth2/authorize?client_id={{client_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FetchCandidateProfile",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const fetchMyProfileSchema = {",
+							"   \"profile\":{",
+							"      \"personalData\":{",
+							"         \"id\":\"string\",",
+							"         \"firstName\":\"string\",",
+							"         \"lastName\":\"string\",",
+							"         \"address\":{",
+							"            \"addressLine1\":\"string\",",
+							"            \"addressLine2\":\"string\",",
+							"            \"addressLine3\":\"string\",",
+							"            \"city\":\"string\",",
+							"            \"stateProvince\":\"string\",",
+							"            \"county\":\"string\",",
+							"            \"country\":\"string\",",
+							"            \"postalCode\":\"string\"",
+							"         },",
+							"         \"contactInfo\":{",
+							"            \"email\":\"string\",",
+							"            \"phone\":\"string\"",
+							"         },",
+							"         \"mostRecentPosition\":\"string\",",
+							"         \"pictureURL\":\"string\"",
+							"      },",
+							"      \"preferences\":{",
+							"         \"desiredLocation\":\"string\",",
+							"         \"desiredSalary\":\"number\",",
+							"         \"distanceWillingToTravel\":\"number\",",
+							"         \"willingToRelocate\":\"boolean\",",
+							"         \"willingToWorkRemote\":\"boolean\"",
+							"      },",
+							"      \"summary\":\"string\",",
+							"      \"skills\":[",
+							"         \"string\"",
+							"      ],",
+							"      \"jobExperiences\":[",
+							"         {",
+							"            \"title\":\"string\",",
+							"            \"company\":\"string\",",
+							"            \"city\":\"string\",",
+							"            \"state\":\"string\",",
+							"            \"description\":\"string\",",
+							"            \"fromDate\":\"string\",",
+							"            \"toDate\":\"string\",",
+							"            \"currentIndicator\":\"boolean\",",
+							"            \"jobFunction\":\"string\"",
+							"         }",
+							"      ],",
+							"      \"educationHistory\":[",
+							"         {",
+							"            \"degreeType\":\"string\",",
+							"            \"fieldOfStudy\":\"string\",",
+							"            \"schoolName\":\"string\",",
+							"            \"dateAttended\":\"string\"",
+							"         }",
+							"      ]",
+							"   }",
+							"}",
+							"",
+							"pm.test('Schema Validation', function(){",
+							"    var result = tv4.validateResult(JSON.parse(responseBody), fetchMyProfileSchema);",
+							"    if(!result.valid){",
+							"        console.log(result);",
+							"    }",
+							"})",
+							"",
+							"",
+							"var data = JSON.parse(responseBody);",
+							"pm.test(\"response must be valid and have a body\", function(){",
+							"     pm.response.to.be.ok; ",
+							"     pm.response.to.be.withBody;",
+							"     pm.response.to.be.json; ",
+							"});",
+							"",
+							"",
+							"pm.test(\"Status code is 200\", function () {",
+							"   pm.expect(data.returnCode).to.equal(200);",
+							"});",
+							"",
+							"pm.test(\"Validate Success message\", function () {",
+							"   pm.expect(data.message).to.equal(\"Successful\");",
+							"});",
+							"",
+							"pm.test(\"Validate firstname\", function(){",
+							"     var expected = pm.environment.get(\"firstName\");",
+							"    pm.expect(data.profile.personalData.firstName).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Candidate Type should be Temp\", function () {",
+							" pm.expect(data.profile.TCAST.candidateType).to.equal(\"Temp\");",
+							"});",
+							" ",
+							"pm.test(\"TCASTFlag should be true\", function () {",
+							" pm.expect(data.profile.TCAST.TCASTFlag).to.equal(true);",
+							"});",
+							"",
+							"pm.test(\"Validate contact id\", function(){",
+							"     var expected = pm.environment.get(\"candidateId\");",
+							"    pm.expect(data.profile.personalData.id).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate People number\", function(){",
+							"    pm.expect(data.profile.TCAST.peopleNumber).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate email\", function(){",
+							"     var expected = pm.environment.get(\"email\").toLowerCase();",
+							"    pm.expect(data.profile.personalData.contactInfo.email).to.equal(expected);",
+							"});",
+							"",
+							"pm.test(\"Validate Education History\", function(){",
+							"    pm.expect(data.profile.educationHistory).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate Job Experiences\", function(){",
+							"    pm.expect(data.profile.jobExperiences).not.equal(null)",
+							"});",
+							"",
+							"pm.test(\"Validate Desired Location Zip\", function(){",
+							"     var expected = pm.environment.get(\"CAPostalCode\");",
+							"    pm.expect(data.profile.preferences.desiredLocationZip).to.equal(expected);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{authToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{authToken}}"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/mobileapi/services/apexrest/me/profile",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"mobileapi",
+						"services",
+						"apexrest",
+						"me",
+						"profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "FetchUserDetails",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var data = JSON.parse(responseBody);\r",
+							"pm.test(\"response must be valid and have a body\", function(){\r",
+							"     pm.response.to.be.ok; \r",
+							"     pm.response.to.be.withBody;\r",
+							"     pm.response.to.be.json; \r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate email\", function(){\r",
+							"     var expected = pm.environment.get(\"email\");\r",
+							"    pm.expect(data.Email).to.equal(expected.toLowerCase());\r",
+							"    pm.expect(data.Username).to.equal(expected.toLowerCase());\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Fed\", function(){\r",
+							"     var expected = pm.environment.get(\"peopleNumber\");\r",
+							"    pm.expect(data.FederationIdentifier).to.equal(expected);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate First name\", function(){\r",
+							"     var expected = pm.environment.get(\"firstName\");\r",
+							"    pm.expect(data.FirstName).to.equal(expected);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validate Last Name\", function(){\r",
+							"     var expected = pm.environment.get(\"lastName\");\r",
+							"    pm.expect(data.LastName).to.equal(expected);\r",
+							"});\r",
+							"pm.test(\"Validate user data\", function () {\r",
+							"    pm.expect(data.Id).not.equal(null);\r",
+							"    pm.expect(data.IsActive).to.equal(true)\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{admin_accessToken}}"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"url": {
+					"raw": "{{_endpoint}}/services/data/v{{version}}/sobjects/user/email/{{email}}",
+					"host": [
+						"{{_endpoint}}"
+					],
+					"path": [
+						"services",
+						"data",
+						"v{{version}}",
+						"sobjects",
+						"user",
+						"email",
+						"{{email}}"
+					]
+				},
+				"description": "Creates new records or updates existing records (upserts records) based on the value of a specified external ID field.\n\nIf the specified value doesn't exist, a new record is created.\nIf a record does exist with that value, the field values specified in the request body are updated.\nIf the value is not unique, the REST API returns a 300 response with the list of matching records.\n\nHEAD, GET, PATCH, DELETE, POST"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
