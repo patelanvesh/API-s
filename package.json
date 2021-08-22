@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "API automation with newman",
   "scripts": {
-    "api-tests": "newman run Authenticated_Mobile_API-US.postman_collection.json -e qs05_Environment.postman_environment.json"
+    "api-tests": "newman run Authenticated_Mobile_API-US.postman_collection.json -e qs05_Environment.postman_environment.json" --folder 'Workflows' --reporters junit,cli,html  --reporter-junit-export report.xml --reporter-html-export reportNewman.html"
   },
   "repository": {
     "type": "git",
