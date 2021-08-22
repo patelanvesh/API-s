@@ -20,6 +20,5 @@
   "homepage": "https://github.com/patelanvesh/API-s#readme",
   "dependencies": {
     "newman": "^5.2.4"
-    "newman-reporter-html": "^1.0.2"
   }
 }
