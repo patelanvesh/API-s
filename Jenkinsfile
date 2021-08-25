@@ -6,7 +6,7 @@ node {
             {
               git url: "https://github.com/patelanvesh/API-s.git", branch : "master"
             }
-            stage('npm install dependencies')
+            stage('Installing dependencies')
             {
               bat "npm install"
             }
