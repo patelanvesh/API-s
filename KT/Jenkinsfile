@@ -1,0 +1,68 @@
+pipeline {
+  agent {
+    label 'AmazonLinux2@itoss-tools-prd'
+  }
+
+  environment {
+    NODEJS_HOME = tool name: 'nodejs-12.20.0', type: 'nodejs'
+  }
+
+  stages {
+    stage('initialize') {
+      steps {
+        withEnv(["PATH+NODEJS=$NODEJS_HOME/bin"]) {
+          sh """#!/bin/bash
+            npm install
+          """
+        }
+      }
+    }
+
+    stage('test') {
+      steps {
+        withEnv(["PATH+NODEJS=$NODEJS_HOME/bin"]) {
+          sh """#!/bin/bash
+            # jenkins_host=\$(echo "\$JENKINS_URL" | sed -e "s/[^/]*\\/\\/\\([^@]*@\\)\\?\\([^:/]*\\).*/\\2/")
+            # base_path="/\$jenkins_host/\$JOB_BASE_NAME"
+
+            # region=\$(curl -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e 's/\\(.*\\)[a-z]/\\1/')
+
+            # env=\$(aws ssm get-parameter --region \$region --name "\$base_path/environment" | jq -r '.Parameter.Value')
+
+            source ./environment.sh
+
+            STATUS=0
+            npx newman run Authenticated_Mobile_API-CA.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/Authenticated-Mobile-API-US-results.xml || STATUS=\$?
+            npx newman run Authenticated_Mobile_API-US.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/Authenticated-Mobile-API-CA-results.xml || STATUS=\$?
+            npx newman run FO-RHD-Account.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/FO-RHD-Account-results.xml || STATUS=\$?
+            npx newman run TCAST-Invite-US-job-posting.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/TCAST-Invite-US-job-posting-results.xml || STATUS=\$?
+            npx newman run TCAST-Invite-US_SPS.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/TCAST-Invite-US_SPS-results.xml || STATUS=\$?
+            npx newman run TCAST-Invite-US_Temp.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/TCAST-Invite-US_Temp-results.xml || STATUS=\$?
+            npx newman run TCAST-Invite-CA_Temp.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/TCAST-Invite-CA_Temp-results.xml || STATUS=\$?
+            npx newman run Prospect-Invite-US.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/Prospect-Invite-US-results.xml || STATUS=\$?
+            npx newman run Prospect-Invite-CA.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/Prospect-Invite-CA-results.xml || STATUS=\$?
+            npx newman run WAA-Invite-US.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/WAA-Invite-US-results.xml || STATUS=\$?
+            npx newman run WAA-Invite-CA.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/WAA-Invite-CA-results.xml || STATUS=\$?
+            npx newman run UnAuthenticated_Mobile_API-US.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/UnAuthenticated_Mobile_API-US-results.xml || STATUS=\$?
+            npx newman run UnAuthenticated_Mobile_API-CA.postman_collection.json --environment Environment_JSON/\${env}_environment.postman_environment.json --reporters junit --silent --reporter-junit-export reports/UnAuthenticated_Mobile_API-CA-results.xml || STATUS=\$?
+            exit \$STATUS
+          """
+        }
+      }
+
+      post {
+        always {
+          junit 'reports/*.xml'
+        }
+      }
+    }
+  }
+
+  post {
+    failure {
+      script {
+        mail to: 'neil.alarcon@roberthalf.com', subject: "Failed Pipeline: ${currentBuild.fullDisplayName}", body: "Something is wrong with ${env.BUILD_URL}"
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "mobile-postman",
+  "version": "1.0.0",
+  "description": "Mobile Postman",
+  "scripts": {
+    "test": "echo \"Not supported\"",
+    "prod":"node starter.js"
+  },
+  "author": "SFCC Mobile",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "newman": "^5.2.2",
+    "newman-reporter-junitfull": "^1.1.1"
+  },
+  "directories": {
+    "test": "test"
+  }
+}

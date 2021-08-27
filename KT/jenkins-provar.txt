@@ -1,0 +1,215 @@
+pipeline {
+
+agent {
+   label 'master'
+ }
+ 
+options {
+     timeout(time: 24, unit: 'HOURS')
+ }
+
+  environment {
+     
+	ProvarDir = "D:/jenkins/tools/com.cloudbees.jenkins.plugins.customtools.CustomTool/provar-1.9.12/provar-1.9.12"
+    PROVAR_HOME = tool name: 'provar-1.9.12', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'
+    GLOBAL_TIMEOUT_MINS = "100"
+    CHROME = tool name: 'Google Chrome', type: 'com.cloudbees.jenkins.plugins.customtools.CustomTool'
+    browser="$browser"
+    testSuite="$testSuite"
+    testCase="$testCase"
+    cc = "sfccautomation@roberthalf.com"
+    build_env = "$testEnvironment"
+    branch="$gitBranch"
+  }
+ 
+  stages {
+  
+    stage('Cloning Repository') {
+      steps {
+ 
+        checkout([
+              $class: 'GitSCM',
+              branches: [
+                [name: "*/"+"$branch"]
+              ],
+              doGenerateSubmoduleConfigurations: false,
+              extensions: [
+              ],
+              submoduleCfg: [],
+              userRemoteConfigs: [[
+                      credentialsId: '6e5b0178-1d3a-46d6-ba1b-40ab6fc402ab',
+                      url: "git@gitlab-ssh-dev.rhgcs.com:daniho01/fission.git"
+                      ]]
+                ])
+
+            }
+      }
+  
+    stage('Hide Generic Account'){
+        
+        steps{
+            
+            script{
+			    def workspace = pwd();
+                def method = load "${workspace}"+"\\templates\\UpdateVariable.groovy"
+                method.createGlobalEnvironmentVariables("$Account",'')
+            }
+        }
+    }
+	
+	
+	stage('Update Build.xml File')
+	
+	{
+	    steps{
+			
+	        powershell label: '', script: '''
+			$workdir="$PWD"
+	        echo $($env:testCase)
+            $extension = ".testcase"
+            $path = $workdir+"\\ANT\\case.xml"
+            $xmldata = [xml](Get-Content $path)
+            $fileset =$xmldata.project.target.\'Run-Test-Case\'.fileset
+            $string2 = $($env:testCase)
+            $charArray = $string2.Split(",")
+            for($j =0; $j -lt $charArray.Length; $j++){
+            $charArray[$j] = $charArray[$j]+\'.testcase\'}
+            for($i =0; $i -lt $charArray.Length; $i++){
+            $include = $fileset.AppendChild($xmldata.CreateElement("include"))
+            $include.SetAttribute("name",$charArray[$i])
+            $xmldata.Save($path)}'''
+	    }
+	}
+    
+	stage('Clean Existing Results'){
+	
+		steps {
+			powershell label: '', script: '''
+			# Deleting previous reports if exists
+			$resultsdir = "$PWD/ANT/Results"
+			If (Test-Path -Path $resultsdir -PathType Container)
+			{ 
+				Remove-Item –path $resultsdir –recurse
+				Write-Host "Deleting existing Results $resultsdir"
+			}	
+			# Deleting previous data if exists
+			$FileName = "$PWD/templates/Test_Output_Data.xlsx"
+			if (Test-Path $FileName) 
+			{
+			Remove-Item $FileName
+			Write-Host "Deleting existing Data Output $FileName"
+			}'''
+		}
+	}
+	
+    stage('Get Jenkins Config') {
+         steps {
+             script{
+                 def workspace = pwd();
+             }
+            writeFile file: "${workspace}"+'\\templates\\properties.txt', text: "${BUILD_URL}"
+         }
+      }
+	  
+	stage('Add Build Info'){
+	 steps {
+			
+			script {  
+				
+				def workspace = pwd();
+				def method1 = load "${workspace}"+"\\templates\\MapEnvironment.groovy"
+				generic =  method1.getAccountValue("$Account")
+               
+			   if (env.testCase == null) {
+                   currentBuild.displayName = env.testSuite+"/env_"+build_env+"/user_"+generic
+                }
+                else{
+                   currentBuild.displayName = env.testSuite+"/"+env.testCase+"/env_"+build_env+"/user_"+generic
+                }
+			}
+		}
+	}
+	
+	stage('Get Build User') {
+         steps {
+            wrap([$class: 'BuildUser']) {
+                script{
+                    env.email = "${BUILD_USER_EMAIL}"
+                    env.user_id = "${BUILD_USER_ID}"
+					}
+				}
+             echo "${email}"
+             echo "${user_id}"
+			}  
+      }
+      
+    stage('Run Tests') {
+      steps {
+	  
+			script{
+					def workspace = pwd();
+					def method1 = load "${workspace}"+"\\templates\\MapEnvironment.groovy"
+					generic =  method1.getAccountValue("$Account")
+					echo "$generic"
+					env.testEnv="$testEnvironment"+"_US_en_"+"$generic"
+					env.generic = "$generic"
+					echo "$testEnv"
+				 }
+			
+		// install provar license configuration file in $HOME/Provar/.license/license.properties
+		configFileProvider([configFile(fileId: 'provar.license', targetLocation: "C:\\Users\\Administrator\\Provar\\.licenses\\license.properties")]) 
+			{
+			withAnt(installation: 'ant-1.10.3') 
+				{
+                    
+				bat label: '', script: '''cd ANT
+				  SET ANT_OPTS="-Xmx1024m"
+				  IF NOT DEFINED testCase (ant -f suite.xml runtests -Dprovar.home="%Provar_Home%" -DtestEnvironment="%testEnv%" -DtestSuite="%testSuite%" -Dbrowser="%browser%" -Demail="%email%" -Dsubject="%user_id% :: Test Run Status: %testSuite%" -Dcc="%cc%") ELSE (ant -f case.xml runtests -Dprovar.home="%Provar_Home%" -DtestEnvironment="%testEnv%" -DtestSuite="%testSuite%" -DtestCase="%testCase%" -Dbrowser="%browser%" -Demail="%email%" -Dsubject="%user_id% :: Test Run Status: %testSuite%/%testCase%/env_%build_env%/user_%generic%" -Dcc="%cc%")'''
+           
+				}
+			}
+      }
+
+      post{
+          
+        always {
+          // archiveArtifacts artifacts: 'loginTest.txt', fingerprint: true
+          junit allowEmptyResults: true, testResults: '**/test-results/*.xml'
+          publishHTML (target: [
+                  allowMissing: false,
+                  alwaysLinkToLastBuild: false,
+                  keepAll: true,
+                  reportDir: 'ANT/Results/',
+                  reportFiles: 'Index.html',
+                  reportName: "RH Report"
+                ]) 
+                
+             publishHTML (target: [
+                  allowMissing: false,
+                  alwaysLinkToLastBuild: false,
+                  keepAll: true,
+                  reportDir: 'ANT/Results/',
+                  reportFiles: 'Test_Run_Report.pdf',
+                  reportName: "BDD Report"
+                ]) 
+                
+                publishHTML (target: [
+                allowMissing: false,
+                alwaysLinkToLastBuild: false,
+                keepAll: true,
+                reportDir: 'templates/',
+                reportFiles: 'Test_Output_Data.xlsx',
+                reportName: "Data"
+                ])
+				
+			script{
+			    def workspace = pwd();
+                def method = load "${workspace}"+"\\templates\\UpdateVariable.groovy"
+                method.createGlobalEnvironmentVariables("$Account","$generic")
+            }
+          
+          }  
+        }
+    }
+  }
+}
